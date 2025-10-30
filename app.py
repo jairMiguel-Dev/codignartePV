@@ -1147,12 +1147,9 @@ def internal_error(error):
 # if __name__ == '__main__':
 #     asyncio.run(init_database())
     
-<<<<<<< HEAD
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(host='0.0.0.0', port=port, debug=debug)
-=======
 #     port = int(os.environ.get('PORT', 5000))
 #     debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
 #     app.run(host='0.0.0.0', port=port, debug=debug)
->>>>>>> c38e7b2 (Preparando para deploy no Render)
