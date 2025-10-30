@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+        <div class="w-24 h-24 bg-danger bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-heart-broken text-danger text-4xl"></i>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Suas vidas acabaram!</h1>
+        
+        <p class="text-gray-600 text-lg mb-6">
+            Não se preocupe! Suas vidas regeneram automaticamente a cada 30 minutos.
+            Enquanto isso, você pode:
+        </p>
+        
+        <div class="grid md:grid-cols-2 gap-4 mb-8">
+            <div class="bg-blue-50 p-4 rounded-lg">
+                <i class="fas fa-clock text-primary text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Aguarde a Regeneração</h3>
+                <p class="text-sm text-gray-600">Suas vidas voltam automaticamente</p>
+            </div>
+            
+            <div class="bg-green-50 p-4 rounded-lg">
+                <i class="fas fa-book text-success text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Revise os Conceitos</h3>
+                <p class="text-sm text-gray-600">Reveja exercícios completos</p>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('dashboard') }}" 
+               class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-secondary transition duration-150 font-semibold">
+                <i class="fas fa-tachometer-alt mr-2"></i>Voltar ao Dashboard
+            </a>
+            
+            <a href="{{ url_for('lista_exercicios') }}" 
+               class="border border-primary text-primary px-6 py-3 rounded-lg hover:bg-primary hover:text-white transition duration-150 font-semibold">
+                <i class="fas fa-eye mr-2"></i>Visualizar Exercícios
+            </a>
+        </div>
+        
+        <div class="mt-6 p-4 bg-yellow-50 rounded-lg">
+            <p class="text-sm text-yellow-800">
+                <i class="fas fa-info-circle mr-2"></i>
+                <strong>Dica:</strong> Você regenera 1 vida a cada 30 minutos, até o máximo de 3 vidas.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

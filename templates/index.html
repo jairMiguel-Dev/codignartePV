@@ -1,0 +1,781 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen">
+    <!-- Enhanced Hero Section -->
+    <section class="relative overflow-hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 text-white">
+        <!-- Animated Background -->
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-10 left-10 w-72 h-72 bg-yellow-400 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+            <div class="absolute top-40 right-10 w-96 h-96 bg-green-400 rounded-full mix-blend-multiply filter blur-xl animate-bounce"></div>
+            <div class="absolute bottom-10 left-1/3 w-80 h-80 bg-red-400 rounded-full mix-blend-multiply filter blur-xl animate-ping"></div>
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Left Content -->
+                <div class="text-center lg:text-left space-y-8">
+                    <!-- Badge -->
+                    <div class="inline-flex items-center px-4 py-3 rounded-2xl bg-yellow-400 bg-opacity-20 border border-yellow-400 backdrop-blur-sm animate-fade-in">
+                        <span class="text-yellow-300 text-sm font-bold tracking-wide">🎉 FEITO NO BRASIL PARA BRASILEIROS</span>
+                    </div>
+                    
+                    <!-- Main Headline -->
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black leading-tight">
+                        <span class="block bg-gradient-to-r from-yellow-400 via-green-400 to-blue-400 bg-clip-text text-transparent">
+                            Aprenda JavaScript
+                        </span>
+                        <span class="block text-white mt-2">
+                            No Seu Tempo,
+                        </span>
+                        <span class="block bg-gradient-to-r from-purple-400 via-pink-400 to-red-400 bg-clip-text text-transparent">
+                            Do Seu Jeito
+                        </span>
+                    </h1>
+                    
+                    <!-- Subheadline -->
+                    <p class="text-xl md:text-2xl text-gray-200 leading-relaxed max-w-2xl">
+                        Domine lógica de programação com JavaScript através de exercícios interativos, 
+                        feedback instantâneo e exemplos do dia a dia.
+                        <strong class="text-yellow-400 font-semibold">Aprenda programando de verdade.</strong>
+                    </p>
+
+                    <!-- Enhanced CTA Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-4 lg:justify-start justify-center">
+                        {% if not current_user.is_authenticated %}
+                        <a href="{{ url_for('cadastro') }}" 
+                           class="group relative bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-2xl hover:shadow-2xl transition-all duration-500 font-bold text-lg shadow-2xl transform hover:scale-105 hover:-translate-y-1">
+                            <span class="relative z-10 flex items-center justify-center gap-2">
+                                🚀 COMEÇAR GRATUITAMENTE
+                            </span>
+                            <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                        </a>
+                        <a href="{{ url_for('login') }}" 
+                           class="group border-2 border-white text-white px-8 py-4 rounded-2xl hover:bg-white hover:text-gray-900 transition-all duration-300 font-bold text-lg backdrop-blur-sm">
+                            👋 JÁ TENHO CONTA
+                        </a>
+                        {% else %}
+                        {% if tem_progresso %}
+                        <a href="{{ url_for('lista_exercicios') }}" 
+                           class="group bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-2xl hover:shadow-2xl transition-all duration-500 font-bold text-lg shadow-2xl transform hover:scale-105">
+                            ▶️ CONTINUAR ESTUDANDO
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('comecar_agora') }}" 
+                           class="group bg-gradient-to-r from-yellow-500 to-orange-500 text-white px-8 py-4 rounded-2xl hover:shadow-2xl transition-all duration-500 font-bold text-lg shadow-2xl transform hover:scale-105">
+                            🎯 COMEÇAR AGORA
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('dashboard') }}" 
+                           class="group border-2 border-white text-white px-8 py-4 rounded-2xl hover:bg-white hover:text-gray-900 transition-all duration-300 font-bold text-lg">
+                            📊 MEU PROGRESSO
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <!-- Enhanced Social Proof -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8">
+                        <div class="flex items-center justify-center lg:justify-start gap-3">
+                            <div class="flex -space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-full border-2 border-gray-900 shadow-lg"></div>
+                                <div class="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full border-2 border-gray-900 shadow-lg"></div>
+                                <div class="w-10 h-10 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full border-2 border-gray-900 shadow-lg"></div>
+                            </div>
+                            <span class="text-gray-200 font-semibold">+500 alunos</span>
+                        </div>
+                        <div class="flex items-center justify-center lg:justify-start gap-3">
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                            <span class="text-gray-200 font-semibold">4.8/5</span>
+                        </div>
+                        <div class="flex items-center justify-center lg:justify-start gap-3">
+                            <i class="fas fa-check-circle text-green-400 text-xl"></i>
+                            <span class="text-gray-200 font-semibold">100% PT-BR</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Content - Interactive Code Demo -->
+                <div class="relative hidden lg:block">
+                    <div class="relative bg-gray-900 rounded-3xl p-8 shadow-2xl border-2 border-gray-800 transform hover:scale-105 transition-transform duration-500">
+                        <div class="flex items-center gap-2 mb-6">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="text-gray-400 ml-4 font-mono">exercicio.js</span>
+                        </div>
+                        
+                        <!-- Code Editor -->
+                        <div class="typewriter-container">
+                            <pre class="code-display text-green-400 text-sm font-mono overflow-x-auto bg-gray-950 rounded-xl p-4 min-h-48" id="heroCodeDisplay"></pre>
+                            <div class="execution-result hidden mt-4 p-4 bg-gray-800 rounded-xl border-l-4 border-blue-500" id="heroExecutionResult">
+                                <p class="text-blue-300 text-sm font-semibold" id="heroResultText"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Control Button -->
+                        <button onclick="startHeroDemo()" class="mt-4 w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-semibold transition duration-300 flex items-center justify-center gap-2" id="heroDemoButton">
+                            <i class="fas fa-play"></i>
+                            Ver Exercício em Ação
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Brazilian Advantage Section -->
+    <section class="py-20 bg-white relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\"100\" height=\"100\" viewBox=\"0 0 100 100\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z\" fill=\"%23000000\" fill-opacity=\"0.4\" fill-rule=\"evenodd\"/%3E%3C/svg%3E');"></div>
+        </div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    Por que aprender com a 
+                    <span class="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">versão brasileira</span>
+                    do Mimo?
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                    A mesma metodologia comprovada, mas adaptada para a realidade do Brasil - com preços acessíveis, 
+                    suporte em português e exemplos que fazem sentido para você.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Card 1 -->
+                <div class="group bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-green-500 transform hover:-translate-y-2">
+                    <div class="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-2xl text-white">🇧🇷</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4 text-center">Totalmente em Português</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Aprenda programação sem barreiras linguísticas. Todas as explicações, exercícios e suporte em português claro e objetivo.
+                    </p>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="group bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-blue-500 transform hover:-translate-y-2">
+                    <div class="w-20 h-20 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-2xl text-white">💸</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4 text-center">Preços em Reais</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Planos acessíveis sem surpresas com câmbio ou taxas internacionais. Invista no seu aprendizado sem complicações.
+                    </p>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="group bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-purple-500 transform hover:-translate-y-2">
+                    <div class="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-2xl text-white">🎯</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4 text-center">Foco na Lógica</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Domine os fundamentos da programação com JavaScript. Exercícios progressivos que desenvolvem seu raciocínio lógico.
+                    </p>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="group bg-gradient-to-br from-white to-gray-50 rounded-3xl p-8 shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200 hover:border-yellow-500 transform hover:-translate-y-2">
+                    <div class="w-20 h-20 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-2xl text-white">📱</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4 text-center">Aprenda em Qualquer Lugar</h3>
+                    <p class="text-gray-600 text-center leading-relaxed">
+                        Estude no seu tempo, no seu ritmo. Exercícios curtos e objetivos que se encaixam na sua rotina.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Enhanced Features Section with Interactive Code -->
+    <section class="py-20 bg-gradient-to-br from-gray-50 to-blue-50 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-20 bg-gradient-to-b from-white to-transparent"></div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-20">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    Aprenda com 
+                    <span class="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">Exercícios Interativos</span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Metodologia gamificada que transforma o aprendizado de programação em uma experiência envolvente
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <!-- Left Features -->
+                <div class="space-y-8">
+                    <!-- Feature 1 -->
+                    <div class="group flex items-start space-x-6 p-6 rounded-3xl bg-white shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-gamepad text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-black text-gray-900 mb-3">Aprendizado Gamificado</h3>
+                            <p class="text-gray-600 leading-relaxed">
+                                Sistema de vidas, conquistas e progressão que torna o estudo de programação viciante. 
+                                Cada exercício concluído é uma vitória no seu aprendizado.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 2 -->
+                    <div class="group flex items-start space-x-6 p-6 rounded-3xl bg-white shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-bolt text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-black text-gray-900 mb-3">Feedback Instantâneo</h3>
+                            <p class="text-gray-600 leading-relaxed">
+                                Saiba imediatamente se seu código está correto. Explicações claras sobre cada erro 
+                                e como corrigi-lo para evoluir rapidamente.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Feature 3 -->
+                    <div class="group flex items-start space-x-6 p-6 rounded-3xl bg-white shadow-xl hover:shadow-2xl transition-all duration-500 border border-gray-200">
+                        <div class="flex-shrink-0 w-16 h-16 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                            <i class="fas fa-chart-line text-white text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-black text-gray-900 mb-3">Progressão Gradual</h3>
+                            <p class="text-gray-600 leading-relaxed">
+                                Comece com conceitos básicos e avance para tópicos mais complexos. 
+                                Cada lição constrói sobre a anterior, garantindo um aprendizado sólido.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Interactive Demo -->
+                <div class="relative">
+                    <div class="bg-gray-900 rounded-3xl p-8 shadow-2xl border-2 border-gray-800 transform hover:scale-105 transition-transform duration-500">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="flex gap-1">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                            <span class="text-gray-400 font-mono text-sm">exercicio_funcoes.js</span>
+                        </div>
+                        
+                        <!-- Interactive Code Editor -->
+                        <div class="typewriter-container">
+                            <pre class="code-display text-green-400 text-sm font-mono overflow-x-auto bg-gray-950 rounded-xl p-4 min-h-64" id="functionsCodeDisplay"></pre>
+                            <div class="execution-result hidden mt-4 p-4 bg-gray-800 rounded-xl border-l-4 border-green-500" id="functionsExecutionResult">
+                                <p class="text-green-300 text-sm font-semibold" id="functionsResultText"></p>
+                            </div>
+                        </div>
+
+                        <!-- Control Button -->
+                        <button onclick="startFunctionsDemo()" class="mt-4 w-full bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg font-semibold transition duration-300 flex items-center justify-center gap-2" id="functionsDemoButton">
+                            <i class="fas fa-play"></i>
+                            Testar Exercício
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Path Section -->
+    <section class="py-20 bg-white relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                    <span class="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        Jornada de Aprendizado
+                    </span>
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Do zero aos conceitos avançados de JavaScript, em uma progressão natural e eficiente
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Module 1 -->
+                <div class="group bg-gradient-to-br from-blue-50 to-purple-50 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-blue-200 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-2xl text-white">1️⃣</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4">Fundamentos</h3>
+                    <ul class="text-gray-600 space-y-3">
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Variáveis e tipos de dados
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Operadores lógicos
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Estruturas condicionais
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Loops e iterações
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Module 2 -->
+                <div class="group bg-gradient-to-br from-green-50 to-blue-50 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-green-200 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-2xl text-white">2️⃣</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4">Funções e Arrays</h3>
+                    <ul class="text-gray-600 space-y-3">
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Funções e parâmetros
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Arrays e métodos
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Objetos e propriedades
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Escopo de variáveis
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Module 3 -->
+                <div class="group bg-gradient-to-br from-purple-50 to-pink-50 rounded-3xl p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-purple-200 transform hover:-translate-y-2">
+                    <div class="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-2xl text-white">3️⃣</span>
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900 mb-4">Conceitos Avançados</h3>
+                    <ul class="text-gray-600 space-y-3">
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Programação assíncrona
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Manipulação do DOM
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Tratamento de erros
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i class="fas fa-check text-green-500"></i>
+                            Projetos práticos
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="py-20 bg-gradient-to-br from-gray-900 to-blue-900 text-white relative overflow-hidden">
+        <!-- Background Elements -->
+        <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-white to-transparent opacity-5"></div>
+        <div class="absolute bottom-0 right-0 w-64 h-64 bg-purple-500 rounded-full blur-3xl opacity-20"></div>
+        <div class="absolute top-1/2 left-10 w-32 h-32 bg-green-500 rounded-full blur-2xl opacity-30"></div>
+
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl md:text-5xl font-black mb-6">
+                    Invista no Seu 
+                    <span class="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Aprendizado</span>
+                </h2>
+                <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+                    Planos transparentes em Reais, sem surpresas. Aprenda JavaScript no seu ritmo.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Free Plan -->
+                <div class="group bg-gradient-to-br from-gray-800 to-gray-900 rounded-3xl p-8 shadow-2xl border-2 border-gray-700 hover:border-green-500 transition-all duration-500 transform hover:-translate-y-4">
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-black text-white mb-4">Plano Gratuito</h3>
+                        <div class="text-4xl font-black text-green-400 mb-2">R$ 0,00</div>
+                        <p class="text-gray-400">Para começar sua jornada</p>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-gray-300">
+                            <i class="fas fa-check text-green-400 text-lg"></i>
+                            <span class="font-semibold">Exercícios básicos</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-300">
+                            <i class="fas fa-check text-green-400 text-lg"></i>
+                            <span class="font-semibold">Sistema de vidas</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-300">
+                            <i class="fas fa-check text-green-400 text-lg"></i>
+                            <span class="font-semibold">Conteúdo fundamental</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-300">
+                            <i class="fas fa-check text-green-400 text-lg"></i>
+                            <span class="font-semibold">Sem anúncios</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-400">
+                            <i class="fas fa-times text-red-400 text-lg"></i>
+                            <span>Exercícios ilimitados</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-gray-400">
+                            <i class="fas fa-times text-red-400 text-lg"></i>
+                            <span>Conteúdo avançado</span>
+                        </li>
+                    </ul>
+
+                    {% if not current_user.is_authenticated %}
+                    <a href="{{ url_for('cadastro') }}" 
+                       class="block w-full bg-gray-700 text-white text-center py-4 rounded-xl hover:bg-gray-600 transition duration-300 font-bold text-lg group-hover:bg-green-600 group-hover:text-white">
+                        Começar Grátis
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('lista_exercicios') }}" 
+                       class="block w-full bg-gray-700 text-white text-center py-4 rounded-xl hover:bg-gray-600 transition duration-300 font-bold text-lg group-hover:bg-green-600 group-hover:text-white">
+                        Continuar Estudando
+                    </a>
+                    {% endif %}
+                </div>
+
+                <!-- Premium Plan -->
+                <div class="group relative bg-gradient-to-br from-yellow-500 via-orange-500 to-red-500 rounded-3xl p-8 shadow-2xl transform hover:-translate-y-4 transition-all duration-500">
+                    <!-- Popular Badge -->
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-green-500 text-white px-6 py-2 rounded-full text-sm font-black shadow-lg">
+                            🏆 MAIS POPULAR
+                        </span>
+                    </div>
+                    
+                    <div class="text-center mb-8">
+                        <h3 class="text-2xl font-black text-white mb-4">Premium</h3>
+                        <div class="text-4xl font-black text-white mb-2">R$ 13,49</div>
+                        <p class="text-white text-opacity-90">por mês</p>
+                    </div>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center gap-3 text-white">
+                            <i class="fas fa-crown text-white text-lg"></i>
+                            <span class="font-semibold">Acesso a todos os Exercícios</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-white">
+                            <i class="fas fa-star text-white text-lg"></i>
+                            <span class="font-semibold">Tudo do plano gratuito</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-white">
+                            <i class="fas fa-bolt text-white text-lg"></i>
+                            <span class="font-semibold">Feedback detalhado</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-white">
+                            <i class="fas fa-rocket text-white text-lg"></i>
+                            <span class="font-semibold">Acesso a area exclusiva</span>
+                        </li>
+                        <li class="flex items-center gap-3 text-white">
+                            <i class="fas fa-shield-alt text-white text-lg"></i>
+                            <span class="font-semibold">Sem anúncios</span>
+                        </li>
+                    </ul>
+
+                    <a href="{{ url_for('loja') }}" 
+                       class="block w-full bg-white text-orange-500 text-center py-4 rounded-xl hover:bg-gray-100 transition duration-300 font-bold text-lg group-hover:shadow-2xl">
+                        ASSINAR AGORA
+                    </a>
+                </div>
+            </div>
+
+            <!-- Payment & Guarantee -->
+            <div class="text-center mt-12">
+                <div class="grid md:grid-cols-3 gap-8 max-w-2xl mx-auto">
+                    <div class="flex items-center justify-center gap-3 text-gray-300">
+                        <i class="fas fa-shield-alt text-green-400 text-xl"></i>
+                        <span class="font-semibold">Pagamento Seguro</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-3 text-gray-300">
+                        <i class="fas fa-sync-alt text-blue-400 text-xl"></i>
+                        <span class="font-semibold">Cancelamento Imediato</span>
+                    </div>
+                    <div class="flex items-center justify-center gap-3 text-gray-300">
+                        <i class="fas fa-headset text-purple-400 text-xl"></i>
+                        <span class="font-semibold">Suporte em PT-BR</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA Section -->
+    <section class="py-20 bg-gradient-to-br from-white to-gray-100 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-green-500/5 via-blue-500/5 to-purple-500/5"></div>
+        
+        <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-4xl md:text-5xl font-black text-gray-900 mb-6">
+                Pronto para 
+                <span class="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Aprender JavaScript</span>?
+            </h2>
+            
+            <p class="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed">
+                Junte-se a centenas de brasileiros que estão dominando lógica de programação 
+                com JavaScript de forma prática, divertida e no seu próprio ritmo.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('cadastro') }}" 
+                   class="group relative bg-gradient-to-r from-green-500 to-emerald-600 text-white px-12 py-5 rounded-2xl hover:shadow-2xl transition-all duration-500 font-black text-lg shadow-2xl transform hover:scale-105">
+                    <span class="relative z-10 flex items-center justify-center gap-3">
+                        🚀 CRIAR CONTA GRÁTIS
+                    </span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 to-green-500 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                </a>
+                <a href="{{ url_for('login') }}" 
+                   class="group border-2 border-gray-800 text-gray-800 px-12 py-5 rounded-2xl hover:bg-gray-800 hover:text-white transition-all duration-300 font-black text-lg">
+                    ↪️ FAZER LOGIN
+                </a>
+                {% else %}
+                <a href="{{ url_for('lista_exercicios') }}" 
+                   class="group bg-gradient-to-r from-purple-500 to-pink-600 text-white px-12 py-5 rounded-2xl hover:shadow-2xl transition-all duration-500 font-black text-lg shadow-2xl transform hover:scale-105">
+                    ▶️ CONTINUAR ESTUDANDO
+                </a>
+                <a href="{{ url_for('dashboard') }}" 
+                   class="group border-2 border-gray-800 text-gray-800 px-12 py-5 rounded-2xl hover:bg-gray-800 hover:text-white transition-all duration-300 font-black text-lg">
+                    📊 VER PROGRESSO
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Typewriter and Execution Simulation Script -->
+<script>
+// Hero Section - Basic JavaScript Exercise
+const heroCode = `// Exercício: Função de Saudação
+function saudacao(nome, hora) {
+    if (hora < 12) {
+        return "Bom dia, " + nome + "!";
+    } else if (hora < 18) {
+        return "Boa tarde, " + nome + "!";
+    } else {
+        return "Boa noite, " + nome + "!";
+    }
+}
+
+// Testando a função
+const usuario = "Maria";
+const horaAtual = 14;
+
+const mensagem = saudacao(usuario, horaAtual);
+
+console.log(mensagem);`;
+
+const heroOutput = `Boa tarde, Maria!`;
+
+// Functions Exercise Code
+const functionsCode = `// Exercício: Calculadora de Média
+function calcularMedia(notas) {
+    let soma = 0;
+    
+    for (let i = 0; i < notas.length; i++) {
+        soma += notas[i];
+    }
+    
+    return soma / notas.length;
+}
+
+// Verificar se o aluno foi aprovado
+function verificarAprovacao(media) {
+    if (media >= 7) {
+        return "Aprovado! 🎉";
+    } else if (media >= 5) {
+        return "Recuperação 📚";
+    } else {
+        return "Reprovado 😔";
+    }
+}
+
+// Exemplo de uso
+const notasAluno = [8.5, 7.0, 9.2, 6.8];
+const media = calcularMedia(notasAluno);
+const resultado = verificarAprovacao(media);
+
+console.log("Notas: " + notasAluno.join(", "));
+console.log("Média: " + media.toFixed(2));
+console.log("Situação: " + resultado);`;
+
+const functionsOutput = `Notas: 8.5, 7, 9.2, 6.8
+Média: 7.88
+Situação: Aprovado! 🎉`;
+
+// Typewriter function
+function typeWriter(element, text, speed = 30, callback = null) {
+    let i = 0;
+    element.innerHTML = '';
+    
+    function type() {
+        if (i < text.length) {
+            // Add blinking cursor effect
+            const cursor = '<span class="animate-pulse">▊</span>';
+            element.innerHTML = text.substring(0, i + 1) + cursor;
+            i++;
+            setTimeout(type, speed);
+        } else {
+            element.innerHTML = text; // Remove cursor when done
+            if (callback) callback();
+        }
+    }
+    type();
+}
+
+// Simulate execution with delayed output
+function simulateExecution(resultElement, resultText, callback = null) {
+    let i = 0;
+    const lines = resultText.split('\n');
+    resultElement.innerHTML = '';
+    resultElement.classList.remove('hidden');
+    
+    function showNextLine() {
+        if (i < lines.length) {
+            resultElement.innerHTML += lines[i] + '<br>';
+            i++;
+            setTimeout(showNextLine, 400);
+        } else if (callback) {
+            callback();
+        }
+    }
+    showNextLine();
+}
+
+// Demo controllers
+function startHeroDemo() {
+    const display = document.getElementById('heroCodeDisplay');
+    const result = document.getElementById('heroExecutionResult');
+    const resultText = document.getElementById('heroResultText');
+    const button = document.getElementById('heroDemoButton');
+    
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Digitando código...';
+    
+    typeWriter(display, heroCode, 20, () => {
+        button.innerHTML = '<i class="fas fa-cog fa-spin"></i> Executando...';
+        
+        setTimeout(() => {
+            simulateExecution(resultText, heroOutput, () => {
+                button.innerHTML = '<i class="fas fa-sync-alt"></i> Executar Novamente';
+                button.disabled = false;
+                button.onclick = () => {
+                    result.classList.add('hidden');
+                    startHeroDemo();
+                };
+            });
+        }, 1000);
+    });
+}
+
+function startFunctionsDemo() {
+    const display = document.getElementById('functionsCodeDisplay');
+    const result = document.getElementById('functionsExecutionResult');
+    const resultText = document.getElementById('functionsResultText');
+    const button = document.getElementById('functionsDemoButton');
+    
+    button.disabled = true;
+    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Digitando código...';
+    
+    typeWriter(display, functionsCode, 15, () => {
+        button.innerHTML = '<i class="fas fa-cog fa-spin"></i> Calculando...';
+        
+        setTimeout(() => {
+            simulateExecution(resultText, functionsOutput, () => {
+                button.innerHTML = '<i class="fas fa-sync-alt"></i> Testar Novamente';
+                button.disabled = false;
+                button.onclick = () => {
+                    result.classList.add('hidden');
+                    startFunctionsDemo();
+                };
+            });
+        }, 1500);
+    });
+}
+
+// Initialize demos when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Start hero demo automatically after a delay
+    setTimeout(startHeroDemo, 2000);
+});
+</script>
+
+<!-- Custom Styles -->
+<style>
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+    
+    @keyframes glow {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.7; }
+    }
+    
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .animate-glow {
+        animation: glow 2s ease-in-out infinite;
+    }
+    
+    /* Smooth scrolling */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Code editor styling */
+    .typewriter-container {
+        position: relative;
+    }
+    
+    .code-display {
+        font-family: 'Fira Code', 'Courier New', monospace;
+        line-height: 1.5;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .execution-result {
+        transition: all 0.5s ease-in-out;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+        .code-display {
+            font-size: 0.75rem;
+            padding: 1rem;
+        }
+        
+        .typewriter-container {
+            margin: 0 -1rem;
+        }
+        
+        .text-4xl {
+            font-size: 2rem;
+        }
+        
+        .text-5xl {
+            font-size: 2.5rem;
+        }
+    }
+</style>
+{% endblock %}

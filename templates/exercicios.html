@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto" id="exercicio-container">
+    <!-- Header com Vidas e Progresso -->
+    <div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-2 bg-white px-4 py-2 rounded-xl shadow-lg">
+                {% for i in range(3) %}
+                    {% if premium or i < current_user.vidas %}
+                    <i class="fas fa-heart text-red-500 text-xl"></i>
+                    {% else %}
+                    <i class="fas fa-heart text-gray-300 text-xl"></i>
+                    {% endif %}
+                {% endfor %}
+                <span class="ml-2 font-semibold text-gray-700" id="vidas-count">
+                    {% if premium %}∞{% else %}{{ current_user.vidas }}{% endif %}
+                </span>
+            </div>
+            
+            {% if premium %}
+            <span class="bg-premium text-yellow-900 px-3 py-1 rounded-full text-sm font-bold flex items-center">
+                <i class="fas fa-crown mr-1"></i>PREMIUM
+            </span>
+            {% endif %}
+        </div>
+        
+        <div class="text-sm text-gray-500">
+            {% if exercicio.modulo %}
+            Módulo: {{ exercicio.modulo|replace('_', ' ')|title }}
+            {% endif %}
+            {% if exercicio.premium %}
+            <span class="bg-premium text-yellow-900 px-2 py-1 rounded-full text-xs font-bold ml-2">
+                <i class="fas fa-crown mr-1"></i>EXCLUSIVO
+            </span>
+            {% endif %}
+            {% if exercicio.eh_desafio_final %}
+            <span class="bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-bold ml-2">
+                <i class="fas fa-flag mr-1"></i>DESAFIO FINAL
+            </span>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Card de Teoria -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6 border-l-4 border-blue-500">
+        <div class="flex items-center mb-4">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                <i class="fas fa-lightbulb text-white text-sm"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Aprendendo na Prática</h3>
+        </div>
+        <p class="text-gray-700 leading-relaxed">{{ exercicio.teoria | safe }}</p>
+        
+        {% if exercicio.eh_desafio_final %}
+        <div class="mt-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+            <div class="flex items-center">
+                <i class="fas fa-flag text-purple-500 mr-3 text-xl"></i>
+                <div>
+                    <h4 class="font-bold text-purple-800">🚀 Desafio Final!</h4>
+                    <p class="text-purple-700 text-sm">Este é o exercício final do módulo. Conclua para avançar!</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Card do Exercício -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+        <div class="flex items-center mb-4">
+            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-3">
+                <i class="fas fa-code text-white text-sm"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Hora do Código!</h3>
+        </div>
+        
+        <p class="text-gray-700 text-lg mb-6">{{ exercicio.pergunta }}</p>
+        
+        <!-- Código Exemplo -->
+        {% if exercicio.codigo_exemplo %}
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+                <h4 class="font-semibold text-gray-700">Seu código:</h4>
+                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {% if exercicio.tipo == 'completion' %}
+                    Complete as partes faltantes
+                    {% else %}
+                    Console simulation
+                    {% endif %}
+                </span>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-4 relative">
+                <pre class="text-gray-100 overflow-x-auto" id="codigo-exemplo">
+                    <code class="language-javascript" id="codigo-conteudo">{{ exercicio.codigo_exemplo }}</code>
+                </pre>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Formulário de Resposta -->
+        <form id="form-resposta" class="space-y-4">
+            <input type="hidden" id="exercicio_id" value="{{ exercicio.id }}">
+            <input type="hidden" id="exercicio_tipo" value="{{ exercicio.tipo }}">
+            
+            <div>
+                <label for="resposta" class="block text-sm font-medium text-gray-700 mb-2">
+                    {% if exercicio.tipo == 'completion' %}
+                    Complete o código acima:
+                    {% else %}
+                    Qual será o resultado?
+                    {% endif %}
+                </label>
+                <input type="text" id="resposta" name="resposta" required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 text-lg font-mono"
+                       placeholder="{% if exercicio.tipo == 'completion' %}Digite aqui...{% else %}Qual o output?{% endif %}"
+                       autocomplete="off"
+                       autofocus>
+            </div>
+            
+            <button type="submit" id="submit-btn"
+                    class="w-full bg-blue-500 text-white py-4 px-6 rounded-lg hover:bg-blue-600 transition duration-150 font-semibold text-lg shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed">
+                <i class="fas fa-play-circle mr-2"></i>Executar e Verificar
+            </button>
+        </form>
+    </div>
+
+    <!-- Terminal Interativo -->
+    <div id="terminal-container" class="bg-gray-800 rounded-lg overflow-hidden shadow-xl hidden">
+        <div class="bg-gray-900 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="flex space-x-2">
+                    <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                </div>
+                <span class="text-gray-300 text-sm font-mono">terminal</span>
+            </div>
+            <div class="text-gray-400 text-xs">
+                <i class="fas fa-terminal mr-1"></i>JavaScript Console
+            </div>
+        </div>
+        
+        <div class="p-4 font-mono text-sm">
+            <div class="text-green-400 mb-2">
+                <span class="text-gray-400">$</span> node exercicio.js
+            </div>
+            <div id="terminal-output" class="text-gray-100 whitespace-pre-wrap min-h-[60px]"></div>
+            <div id="terminal-cursor" class="text-green-400 inline-block animate-pulse">▊</div>
+        </div>
+        
+        <div id="terminal-actions" class="bg-gray-700 px-4 py-2 hidden">
+            <!-- Ações serão adicionadas dinamicamente -->
+        </div>
+    </div>
+
+    <!-- Área de Feedback -->
+    <div id="feedback-area" class="hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 w-full max-w-md z-50">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 border-2 border-blue-500">
+            <div id="feedback-content" class="text-center mb-4"></div>
+            <div id="feedback-actions" class="flex flex-col sm:flex-row gap-3 justify-center">
+                <!-- Ações serão adicionadas dinamicamente -->
+            </div>
+            <div id="dica-area" class="mt-4 hidden">
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <div class="flex items-start">
+                        <i class="fas fa-lightbulb text-yellow-500 mt-1 mr-2"></i>
+                        <div>
+                            <h5 class="font-semibold text-yellow-800 text-sm">Dica:</h5>
+                            <p id="dica-texto" class="text-yellow-700 text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const respostaInput = document.getElementById('resposta');
+    const formResposta = document.getElementById('form-resposta');
+    const terminalContainer = document.getElementById('terminal-container');
+    const terminalOutput = document.getElementById('terminal-output');
+    const terminalCursor = document.getElementById('terminal-cursor');
+    const feedbackArea = document.getElementById('feedback-area');
+    const feedbackContent = document.getElementById('feedback-content');
+    const feedbackActions = document.getElementById('feedback-actions');
+    const dicaArea = document.getElementById('dica-area');
+    const dicaTexto = document.getElementById('dica-texto');
+
+    // Focar no input automaticamente
+    setTimeout(() => {
+        respostaInput.focus();
+    }, 300);
+
+    // Sistema do Terminal
+    function mostrarTerminal(output, tempoDigitacao = 30) {
+        terminalContainer.classList.remove('hidden');
+        terminalOutput.innerHTML = '';
+        terminalCursor.classList.remove('hidden');
+        
+        // Rolar para o terminal
+        setTimeout(() => {
+            terminalContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }, 100);
+
+        // Simular digitação
+        let i = 0;
+        function typeWriter() {
+            if (i < output.length) {
+                terminalOutput.innerHTML += output.charAt(i);
+                i++;
+                setTimeout(typeWriter, tempoDigitacao);
+            } else {
+                terminalCursor.classList.add('hidden');
+            }
+        }
+        typeWriter();
+    }
+
+    // Lógica do formulário
+    formResposta.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submit-btn');
+        const resposta = respostaInput.value;
+        const exercicioId = document.getElementById('exercicio_id').value;
+
+        // Desabilitar botão e mostrar loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Executando...';
+
+        try {
+            const response = await fetch('/verificar_resposta', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    exercicio_id: parseInt(exercicioId),
+                    resposta: resposta
+                })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Mostrar terminal
+                if (data.terminal_output) {
+                    mostrarTerminal(data.terminal_output);
+                }
+                
+                // Atualizar vidas
+                const vidasCount = document.getElementById('vidas-count');
+                if (vidasCount) {
+                    vidasCount.textContent = data.vidas_restantes;
+                }
+                
+                // Mostrar feedback
+                feedbackContent.innerHTML = data.feedback;
+                feedbackArea.classList.remove('hidden');
+                
+                if (data.correto) {
+                    feedbackContent.classList.add('text-green-600', 'text-xl', 'font-semibold');
+                    
+                    if (data.eh_desafio_final && data.modulo_concluido) {
+                        feedbackActions.innerHTML = `
+                            <a href="{{ url_for('modulos') }}" 
+                               class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition duration-150 font-semibold text-center">
+                                <i class="fas fa-trophy mr-2"></i>Ver Módulos
+                            </a>
+                        `;
+                    } else {
+                        feedbackActions.innerHTML = `
+                            <a href="/proximo_exercicio/${exercicioId}" 
+                               class="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition duration-150 font-semibold text-center">
+                                <i class="fas fa-arrow-right mr-2"></i>Próximo Exercício
+                            </a>
+                        `;
+                    }
+                } else {
+                    feedbackContent.classList.add('text-red-600', 'text-xl', 'font-semibold');
+                    
+                    if (data.sem_vidas) {
+                        feedbackActions.innerHTML = `
+                            <a href="{{ url_for('dashboard') }}" 
+                               class="bg-red-500 text-white px-6 py-3 rounded-lg hover:bg-red-600 transition duration-150 font-semibold text-center">
+                                <i class="fas fa-home mr-2"></i>Voltar ao Dashboard
+                            </a>
+                        `;
+                    } else {
+                        feedbackActions.innerHTML = `
+                            <button onclick="tentarNovamente()" 
+                                    class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-150 font-semibold">
+                                <i class="fas fa-redo mr-2"></i>Tentar Novamente
+                            </button>
+                        `;
+                        
+                        // Mostrar dica se disponível
+                        if (data.dica) {
+                            dicaTexto.textContent = data.dica;
+                            dicaArea.classList.remove('hidden');
+                        }
+                    }
+                }
+                
+                // Rolar para o feedback
+                setTimeout(() => {
+                    feedbackArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 500);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            feedbackContent.innerHTML = '❌ Erro ao verificar resposta. Tente novamente.';
+            feedbackContent.classList.add('text-red-600', 'text-xl', 'font-semibold');
+            feedbackArea.classList.remove('hidden');
+        } finally {
+            // Resetar botão
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-play-circle mr-2"></i>Executar e Verificar';
+        }
+    });
+
+    // Fechar feedback ao clicar fora
+    document.addEventListener('click', function(e) {
+        if (feedbackArea && !feedbackArea.contains(e.target) && !e.target.closest('#form-resposta')) {
+            feedbackArea.classList.add('hidden');
+            dicaArea.classList.add('hidden');
+        }
+    });
+});
+
+// Funções globais para os botões
+function tentarNovamente() {
+    document.getElementById('feedback-area').classList.add('hidden');
+    document.getElementById('dica-area').classList.add('hidden');
+    document.getElementById('resposta').focus();
+}
+
+// Teclas de atalho
+document.addEventListener('keydown', function(e) {
+    // Ctrl + Enter para submeter
+    if (e.ctrlKey && e.key === 'Enter') {
+        document.getElementById('form-resposta').dispatchEvent(new Event('submit'));
+    }
+    
+    // ESC para fechar feedback
+    if (e.key === 'Escape') {
+        document.getElementById('feedback-area').classList.add('hidden');
+        document.getElementById('dica-area').classList.add('hidden');
+    }
+});
+</script>
+
+<style>
+.animate-pulse {
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Melhorias de responsividade */
+@media (max-width: 768px) {
+    #exercicio-container {
+        padding: 0 1rem;
+    }
+}
+</style>
+{% endblock %}

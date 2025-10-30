@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto text-center">
+    <div class="bg-white rounded-2xl shadow-lg p-8">
+        <div class="w-24 h-24 bg-gradient-to-r from-premium to-yellow-400 rounded-full flex items-center justify-center mx-auto mb-6">
+            <i class="fas fa-crown text-white text-4xl"></i>
+        </div>
+        
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Conteúdo Exclusivo Premium</h1>
+        
+        <p class="text-gray-600 text-lg mb-6">
+            Este exercício faz parte do nosso conteúdo exclusivo para assinantes Premium.
+            Desbloqueie todos os benefícios:
+        </p>
+        
+        <div class="grid md:grid-cols-2 gap-4 mb-8">
+            <div class="bg-premium bg-opacity-10 p-4 rounded-lg">
+                <i class="fas fa-infinity text-premium text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Vidas Infinitas</h3>
+                <p class="text-sm text-gray-600">Estude sem interrupções</p>
+            </div>
+            
+            <div class="bg-premium bg-opacity-10 p-4 rounded-lg">
+                <i class="fas fa-headphones text-premium text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Teoria em Áudio</h3>
+                <p class="text-sm text-gray-600">Aprenda de diferentes formas</p>
+            </div>
+            
+            <div class="bg-premium bg-opacity-10 p-4 rounded-lg">
+                <i class="fas fa-star text-premium text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Conteúdo Exclusivo</h3>
+                <p class="text-sm text-gray-600">Acesso a exercícios avançados</p>
+            </div>
+            
+            <div class="bg-premium bg-opacity-10 p-4 rounded-lg">
+                <i class="fas fa-bolt text-premium text-2xl mb-2"></i>
+                <h3 class="font-semibold text-gray-800 mb-2">Sem Esperas</h3>
+                <p class="text-sm text-gray-600">Sem tempo de regeneração</p>
+            </div>
+        </div>
+        
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{{ url_for('loja') }}" 
+               class="bg-premium text-white px-8 py-4 rounded-xl hover:bg-yellow-500 transition duration-150 font-semibold text-lg shadow-lg hover:shadow-xl">
+                <i class="fas fa-crown mr-2"></i>Assinar Premium
+            </a>
+            
+            <a href="{{ url_for('lista_exercicios') }}" 
+               class="border border-primary text-primary px-8 py-4 rounded-xl hover:bg-primary hover:text-white transition duration-150 font-semibold text-lg">
+                <i class="fas fa-arrow-left mr-2"></i>Voltar aos Exercícios
+            </a>
+        </div>
+        
+        <div class="mt-6 p-4 bg-yellow-50 rounded-lg">
+            <p class="text-sm text-yellow-800">
+                <i class="fas fa-info-circle mr-2"></i>
+                <strong>Investimento:</strong> Apenas R$ 13,49 por 30 dias de acesso ilimitado!
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Política de Privacidade
+        </h1>
+        <p class="text-gray-600 mt-2">Última atualização: {{ data_atual.strftime('%d/%m/%Y') }}</p>
+    </div>
+
+    <div class="prose prose-lg max-w-none">
+        <!-- Introdução -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">1. Introdução</h2>
+            <p class="text-gray-700 mb-4">
+                Esta Política de Privacidade descreve como o Codignarte coleta, usa, armazena e protege suas informações pessoais, em conformidade com a <strong>Lei Geral de Proteção de Dados (LGPD - Lei nº 13.709/2018)</strong>.
+            </p>
+            <p class="text-gray-700">
+                Ao utilizar nossos serviços, você concorda com as práticas descritas nesta política.
+            </p>
+        </section>
+
+        <!-- Dados Coletados -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">2. Dados Pessoais Coletados</h2>
+            <p class="text-gray-700 mb-4">
+                Coletamos os seguintes tipos de dados:
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-4 mb-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-800 mb-2">Dados Cadastrais</h3>
+                    <ul class="list-disc list-inside text-blue-700 text-sm space-y-1">
+                        <li>Nome de usuário</li>
+                        <li>Endereço de e-mail</li>
+                        <li>Data de criação da conta</li>
+                    </ul>
+                </div>
+
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-green-800 mb-2">Dados de Uso</h3>
+                    <ul class="list-disc list-inside text-green-700 text-sm space-y-1">
+                        <li>Progresso nos exercícios</li>
+                        <li>Histórico de respostas</li>
+                        <li>Tempo de estudo</li>
+                        <li>Preferências de aprendizado</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-purple-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-purple-800 mb-2">Dados de Pagamento</h3>
+                    <ul class="list-disc list-inside text-purple-700 text-sm space-y-1">
+                        <li>Informações de transação</li>
+                        <li>Status de assinatura</li>
+                        <li>Histórico de compras</li>
+                    </ul>
+                </div>
+
+                <div class="bg-yellow-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-yellow-800 mb-2">Dados Técnicos</h3>
+                    <ul class="list-disc list-inside text-yellow-700 text-sm space-y-1">
+                        <li>Endereço IP</li>
+                        <li>Tipo de navegador</li>
+                        <li>Dispositivo utilizado</li>
+                        <li>Logs de acesso</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Finalidade do Tratamento -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">3. Finalidade do Tratamento</h2>
+            <p class="text-gray-700 mb-4">
+                Seus dados são utilizados para:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                <li>Fornecer e melhorar nossos serviços educacionais</li>
+                <li>Personalizar sua experiência de aprendizado</li>
+                <li>Processar pagamentos e gerenciar assinaturas</li>
+                <li>Enviar comunicações importantes sobre o serviço</li>
+                <li>Cumprir obrigações legais e regulatórias</li>
+                <li>Prevenir fraudes e garantir a segurança da plataforma</li>
+            </ul>
+        </section>
+
+        <!-- Compartilhamento de Dados -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">4. Compartilhamento de Dados</h2>
+            <p class="text-gray-700 mb-4">
+                Seus dados podem ser compartilhados com:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                <li><strong>Processadores de Pagamento:</strong> Stripe (dados necessários para transações)</li>
+                <li><strong>Prestadores de Serviço:</strong> Hospedagem, análise de dados (apenas dados técnicos)</li>
+                <li><strong>Autoridades Legais:</strong> Quando exigido por lei ou processo legal</li>
+            </ul>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p class="text-green-700">
+                    <strong>⚠️ Importante:</strong> Não vendemos ou alugamos seus dados pessoais para terceiros.
+                </p>
+            </div>
+        </section>
+
+        <!-- Cookies e Tecnologias Similares -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">5. Cookies e Tecnologias Similares</h2>
+            <p class="text-gray-700 mb-4">
+                Utilizamos cookies para:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                <li>Manter sua sessão ativa</li>
+                <li>Lembrar suas preferências</li>
+                <li>Analisar o uso da plataforma</li>
+                <li>Melhorar a performance</li>
+            </ul>
+            <p class="text-gray-700">
+                Você pode gerenciar as configurações de cookies através do seu navegador.
+            </p>
+        </section>
+
+        <!-- Segurança dos Dados -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">6. Segurança dos Dados</h2>
+            <p class="text-gray-700 mb-4">
+                Implementamos medidas de segurança técnicas e administrativas para proteger seus dados:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                <li>Criptografia de dados sensíveis</li>
+                <li>Controle de acesso baseado em função</li>
+                <li>Monitoramento contínuo de segurança</li>
+                <li>Backups regulares</li>
+                <li>Protocolos seguros (HTTPS/SSL)</li>
+            </ul>
+        </section>
+
+        <!-- Direitos do Titular -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">7. Seus Direitos</h2>
+            <p class="text-gray-700 mb-4">
+                Conforme a LGPD, você tem direito a:
+            </p>
+            <div class="grid md:grid-cols-2 gap-4">
+                <div class="bg-blue-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-blue-800 mb-2">Direitos Fundamentais</h3>
+                    <ul class="list-disc list-inside text-blue-700 text-sm space-y-1">
+                        <li>Confirmar a existência de tratamento</li>
+                        <li>Acessar seus dados</li>
+                        <li>Corrigir dados incompletos ou inexatos</li>
+                        <li>Anonimizar, bloquear ou eliminar dados</li>
+                    </ul>
+                </div>
+
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <h3 class="font-semibold text-green-800 mb-2">Direitos Adicionais</h3>
+                    <ul class="list-disc list-inside text-green-700 text-sm space-y-1">
+                        <li>Portabilidade de dados</li>
+                        <li>Eliminação de dados desnecessários</li>
+                        <li>Informação sobre compartilhamento</li>
+                        <li>Revogar o consentimento</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Retenção de Dados -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">8. Retenção de Dados</h2>
+            <p class="text-gray-700 mb-4">
+                Mantemos seus dados pessoais apenas pelo tempo necessário para:
+            </p>
+            <ul class="list-disc list-inside text-gray-700 space-y-2 mb-4">
+                <li><strong>Contas Ativas:</strong> Enquanto a conta estiver ativa</li>
+                <li><strong>Contas Inativas:</strong> 2 anos após última atividade</li>
+                <li><strong>Dados de Pagamento:</strong> 5 anos (obrigação legal)</li>
+                <li><strong>Logs de Segurança:</strong> 6 meses</li>
+            </ul>
+        </section>
+
+        <!-- Alterações na Política -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">9. Alterações na Política</h2>
+            <p class="text-gray-700 mb-4">
+                Podemos atualizar esta política periodicamente. Alterações significativas serão comunicadas por e-mail com 30 dias de antecedência.
+            </p>
+            <p class="text-gray-700">
+                A versão atual sempre estará disponível nesta página com a data da última atualização.
+            </p>
+        </section>
+
+        <!-- Contato do Encarregado -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">10. Contato do Encarregado (DPO)</h2>
+            <p class="text-gray-700 mb-4">
+                Para exercer seus direitos ou esclarecer dúvidas sobre proteção de dados:
+            </p>
+            <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <p class="text-purple-700">
+                    <strong>Encarregado de Proteção de Dados:</strong><br>
+                    E-mail: dpo@codignarte.com<br>
+                    Prazo de Resposta: 15 dias úteis<br>
+                    Horário: Segunda a Sexta, 9h às 18h
+                </p>
+            </div>
+        </section>
+
+        <!-- ANPD -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">11. Autoridade Nacional de Proteção de Dados (ANPD)</h2>
+            <p class="text-gray-700">
+                Caso não fique satisfeito com nossa resposta, você pode entrar em contato com a ANPD através do site <a href="https://www.gov.br/anpd" class="text-primary hover:underline">gov.br/anpd</a>.
+            </p>
+        </section>
+    </div>
+</div>
+{% endblock %}

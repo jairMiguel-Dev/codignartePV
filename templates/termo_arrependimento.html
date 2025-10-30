@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Termo de Arrependimento
+        </h1>
+        <p class="text-gray-600 mt-2">Conforme Artigo 49 do Código de Defesa do Consumidor</p>
+    </div>
+
+    <div class="prose prose-lg max-w-none">
+        <!-- Introdução -->
+        <section class="mb-8">
+            <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6">
+                <div class="flex items-center">
+                    <i class="fas fa-shield-alt text-green-500 text-2xl mr-4"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-green-800">Proteção ao Consumidor</h3>
+                        <p class="text-green-700">
+                            Você tem o direito de se arrepender da compra em até <strong>7 dias corridos</strong>, sem precisar justificar o motivo.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-gray-700 mb-4">
+                Este direito está garantido pelo <strong>artigo 49 do Código de Defesa do Consumidor (Lei nº 8.078/90)</strong> e se aplica a compras realizadas fora do estabelecimento comercial, incluindo compras online.
+            </p>
+        </section>
+
+        <!-- Condições -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Condições para Exercício do Direito</h2>
+
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-check-circle text-blue-500 text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-blue-800">Reembolso Integral</h3>
+                    </div>
+                    <ul class="list-disc list-inside text-blue-700 space-y-2">
+                        <li>Dentro de 7 dias corridos da compra</li>
+                        <li>Nenhum exercício premium realizado</li>
+                        <li>Reembolso total do valor pago</li>
+                        <li>Processamento em até 5 dias úteis</li>
+                    </ul>
+                </div>
+
+                <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+                    <div class="flex items-center mb-3">
+                        <i class="fas fa-info-circle text-yellow-500 text-xl mr-3"></i>
+                        <h3 class="text-lg font-semibold text-yellow-800">Cancelamento Sem Reembolso</h3>
+                    </div>
+                    <ul class="list-disc list-inside text-yellow-700 space-y-2">
+                        <li>Após 7 dias da compra</li>
+                        <li>Exercícios premium já realizados</li>
+                        <li>Benefícios mantidos até fim do ciclo</li>
+                        <li>Sem direito a reembolso</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Como Solicitar -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Como Solicitar o Arrependimento</h2>
+
+            <div class="space-y-4">
+                <div class="flex items-start">
+                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                        <span class="font-semibold">1</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Acesse sua Conta</h3>
+                        <p class="text-gray-700">Faça login na plataforma e vá até a seção "Minha Conta" ou "Assinatura".</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                        <span class="font-semibold">2</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Clique em "Cancelar Assinatura"</h3>
+                        <p class="text-gray-700">O sistema verificará automaticamente seu direito ao reembolso.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                        <span class="font-semibold">3</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Confirmação Imediata</h3>
+                        <p class="text-gray-700">Receba a confirmação do cancelamento e as informações sobre reembolso.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <div class="bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center mr-4 mt-1 flex-shrink-0">
+                        <span class="font-semibold">4</span>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800 mb-2">Processamento</h3>
+                        <p class="text-gray-700">O reembolso será processado em até 5 dias úteis na forma de pagamento original.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Informações Importantes -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Informações Importantes</h2>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-6 space-y-4">
+                <div class="flex items-start">
+                    <i class="fas fa-clock text-gray-500 mr-3 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Prazo de 7 Dias</h3>
+                        <p class="text-gray-700">O prazo conta-se a partir da data da confirmação do pagamento, incluindo sábados, domingos e feriados.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <i class="fas fa-credit-card text-gray-500 mr-3 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Forma de Reembolso</h3>
+                        <p class="text-gray-700">O valor será devolvido na mesma forma de pagamento utilizada na compra original.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start">
+                    <i class="fas fa-exchange-alt text-gray-500 mr-3 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-gray-800">Serviços Parcialmente Utilizados</h3>
+                        <p class="text-gray-700">Se você utilizou parcialmente o serviço premium, o reembolso poderá ser proporcional ao período não utilizado.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Base Legal -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Base Legal</h2>
+
+            <div class="bg-red-50 border border-red-200 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-red-800 mb-3">Artigo 49 do Código de Defesa do Consumidor</h3>
+                <p class="text-red-700 italic mb-4">
+                    "O consumidor pode desistir do contrato, no prazo de 7 dias a contar de sua assinatura ou do ato de recebimento do produto ou serviço, sempre que a contratação de fornecimento de produtos e serviços ocorrer fora do estabelecimento comercial, especialmente por telefone ou a domicílio."
+                </p>
+                <p class="text-red-700">
+                    <strong>Parágrafo único:</strong> "Se o consumidor exercitar o direito de arrependimento, os valores eventualmente pagos, a qualquer título, durante o prazo de reflexão, serão devolvidos, de imediato, monetariamente atualizados."
+                </p>
+            </div>
+        </section>
+
+        <!-- Contato -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">Dúvidas e Suporte</h2>
+            <p class="text-gray-700 mb-4">
+                Em caso de dúvidas sobre o direito de arrependimento ou dificuldades no processo de cancelamento:
+            </p>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <h3 class="font-semibold text-blue-800 mb-2">Atendimento ao Cliente</h3>
+                        <p class="text-blue-700">
+                            E-mail: suporte@codignarte.com<br>
+                            WhatsApp: (11) 99999-9999<br>
+                            Horário: Segunda a Sexta, 9h às 18h
+                        </p>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-blue-800 mb-2">Jurídico</h3>
+                        <p class="text-blue-700">
+                            E-mail: juridico@codignarte.com<br>
+                            Para questões legais e reclamações
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Aviso Final -->
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
+            <i class="fas fa-exclamation-triangle text-yellow-500 text-2xl mb-3"></i>
+            <p class="text-yellow-700 font-semibold">
+                Este termo não substitui a legislação vigente. Em caso de conflito, prevalecem as disposições do Código de Defesa do Consumidor.
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

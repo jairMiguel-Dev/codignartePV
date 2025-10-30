@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="text-center mb-8">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Exercícios de JavaScript
+        </h1>
+        <p class="text-gray-600 mt-2">Pratique lógica de programação com desafios interativos</p>
+    </div>
+
+    <!-- Welcome Message for New Users -->
+    {% if exercicios_completos_ids|length == 0 %}
+    <div class="bg-gradient-to-r from-primary to-secondary text-white rounded-2xl shadow-lg p-8 mb-8 text-center animate-fade-in">
+        <div class="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-star text-2xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-4">Pronto para Começar? 🚀</h2>
+        <p class="text-lg opacity-90">
+            Escolha qualquer exercício abaixo para iniciar sua jornada de aprendizado. 
+            Cada exercício inclui teoria rápida e prática!
+        </p>
+    </div>
+    {% endif %}
+
+    <!-- Vida Counter -->
+    <div class="bg-white rounded-2xl shadow-lg p-6 mb-8 animate-slide-up">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2">
+                    {% for i in range(3) %}
+                        {% if i < vidas %}
+                        <i class="fas fa-heart text-danger text-2xl"></i>
+                        {% else %}
+                        <i class="fas fa-heart text-gray-300 text-2xl"></i>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div>
+                    <span class="text-lg font-semibold text-gray-700" id="vidas-count-list">{{ vidas }} vidas restantes</span>
+                    {% if vidas < 3 %}
+                    <div class="text-sm text-gray-500 mt-1">
+                        Próxima vida em: <span id="tempo-restante-list">
+                            {% if tempo_restante > 0 %}
+                                {{ "%02d:%02d" | format(tempo_restante // 60, tempo_restante % 60) }}
+                            {% else %}
+                                Regenerando...
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="text-sm text-gray-500">
+                Regenera a cada 30 minutos
+            </div>
+        </div>
+    </div>
+
+    <!-- Exercises List -->
+    <div class="space-y-4">
+        {% for exercicio in exercicios %}
+        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition duration-150 p-6 animate-slide-up" style="animation-delay: {{ loop.index * 0.1 }}s">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center space-x-4">
+                    {% if exercicio.id in exercicios_completos_ids %}
+                    <div class="w-10 h-10 bg-success rounded-full flex items-center justify-center">
+                        <i class="fas fa-check text-white"></i>
+                    </div>
+                    {% else %}
+                    <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+                        <span class="text-white font-semibold">{{ loop.index }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div>
+                        <h3 class="font-semibold text-gray-800">{{ exercicio.pergunta[:60] }}...</h3>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                                {{ exercicio.nivel }}
+                            </span>
+                            {% if exercicio.id in exercicios_completos_ids %}
+                            <span class="px-2 py-1 bg-success bg-opacity-10 text-success text-xs rounded-full">
+                                Completo
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    {% if exercicio.id in exercicios_completos_ids %}
+                    <span class="text-success font-semibold text-sm md:text-base">
+                        <i class="fas fa-check mr-1"></i>Concluído
+                    </span>
+                    {% endif %}
+                    
+                    <a href="{{ url_for('exercicio', exercicio_id=exercicio.id) }}" 
+                       class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary transition duration-150 font-medium">
+                        {% if exercicio.id in exercicios_completos_ids %}
+                        <i class="fas fa-redo mr-1"></i>Refazer
+                        {% else %}
+                        <i class="fas fa-play mr-1"></i>Iniciar
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Progress Indicator -->
+    <div class="mt-8 text-center">
+        <div class="bg-white rounded-2xl shadow-lg p-6 animate-slide-up" style="animation-delay: 0.6s">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-700 font-medium">Progresso Geral</span>
+                <span class="text-primary font-bold">{{ exercicios_completos_ids|length }}/{{ exercicios|length }}</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-primary h-4 rounded-full transition-all duration-500" 
+                     style="width: {{ (exercicios_completos_ids|length / exercicios|length * 100)|round|int }}%"></div>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">{{ ((exercicios_completos_ids|length / exercicios|length * 100)|round|int) }}% completo</p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Garantir que a página role para o topo ao carregar
+document.addEventListener('DOMContentLoaded', function() {
+    window.scrollTo(0, 0);
+});
+</script>
+{% endblock %}

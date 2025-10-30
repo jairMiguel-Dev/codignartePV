@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-md lg:max-w-lg xl:max-w-xl transform hover:scale-105 transition-transform duration-300">
+        <!-- Card Principal -->
+        <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200">
+            <!-- Header com Gradiente -->
+            <div class="bg-gradient-to-r from-primary to-secondary p-6 sm:p-8 text-center">
+                <div class="flex items-center justify-center mb-4">
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center">
+                        <i class="fas fa-user-plus text-white text-xl sm:text-2xl"></i>
+                    </div>
+                </div>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white mb-2">
+                    Criar Conta
+                </h1>
+                <p class="text-white text-opacity-90 text-sm sm:text-base lg:text-lg">
+                    Junte-se à comunidade Codignarte
+                </p>
+            </div>
+
+            <!-- Conteúdo do Formulário -->
+            <div class="p-6 sm:p-8 lg:p-10">
+                {% if error %}
+                <div class="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-6 mb-6 animate-shake">
+                    <div class="flex items-start space-x-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-500 text-lg sm:text-xl"></i>
+                        </div>
+                        <div class="flex-1">
+                            <p class="text-red-800 font-semibold text-sm sm:text-base">{{ error }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <form method="POST" class="space-y-4 sm:space-y-6">
+                    <!-- Campo Username -->
+                    <div class="group">
+                        <label for="username" class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
+                            <i class="fas fa-user mr-2 text-primary group-focus-within:text-secondary"></i>
+                            Nome de Usuário
+                        </label>
+                        <div class="relative">
+                            <input type="text" id="username" name="username" required
+                                   class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-200 rounded-2xl 
+                                          focus:ring-4 focus:ring-primary focus:ring-opacity-20 
+                                          focus:border-primary transition-all duration-300
+                                          placeholder-gray-400 text-gray-800 text-sm sm:text-base
+                                          hover:border-gray-300"
+                                   placeholder="Escolha um nome de usuário único">
+                            <div class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo Email -->
+                    <div class="group">
+                        <label for="email" class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
+                            <i class="fas fa-envelope mr-2 text-primary group-focus-within:text-secondary"></i>
+                            Email
+                        </label>
+                        <div class="relative">
+                            <input type="email" id="email" name="email" required
+                                   class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-200 rounded-2xl 
+                                          focus:ring-4 focus:ring-primary focus:ring-opacity-20 
+                                          focus:border-primary transition-all duration-300
+                                          placeholder-gray-400 text-gray-800 text-sm sm:text-base
+                                          hover:border-gray-300"
+                                   placeholder="seu@email.com">
+                            <div class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center">
+                                <i class="fas fa-check-circle text-green-500 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campo Senha -->
+                    <div class="group">
+                        <label for="senha" class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
+                            <i class="fas fa-lock mr-2 text-primary group-focus-within:text-secondary"></i>
+                            Senha
+                        </label>
+                        <div class="relative">
+                            <input type="password" id="senha" name="senha" required
+                                   class="w-full px-4 sm:px-6 py-3 sm:py-4 border-2 border-gray-200 rounded-2xl 
+                                          focus:ring-4 focus:ring-primary focus:ring-opacity-20 
+                                          focus:border-primary transition-all duration-300
+                                          placeholder-gray-400 text-gray-800 text-sm sm:text-base
+                                          hover:border-gray-300 pr-10"
+                                   placeholder="Crie uma senha segura">
+                            <div class="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center">
+                                <button type="button" onclick="togglePassword('senha')" 
+                                        class="text-gray-400 hover:text-gray-600 transition-colors duration-200">
+                                    <i class="fas fa-eye" id="senhaEyeIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-500 mt-2">
+                            🔒 Use pelo menos 8 caracteres com letras e números
+                        </p>
+                    </div>
+
+                    <!-- Checkbox de Termos -->
+                    <div class="bg-gray-50 rounded-2xl p-4 sm:p-6 border border-gray-200">
+                        <div class="flex items-start space-x-3 sm:space-x-4">
+                            <div class="flex-shrink-0 mt-1">
+                                <input type="checkbox" id="aceitar_termos" name="aceitar_termos" required
+                                       class="w-4 h-4 sm:w-5 sm:h-5 rounded border-2 border-gray-300 
+                                              text-primary focus:ring-2 focus:ring-primary 
+                                              focus:ring-opacity-50 cursor-pointer
+                                              checked:bg-primary checked:border-primary
+                                              transition-all duration-200">
+                            </div>
+                            <label for="aceitar_termos" class="flex-1 text-xs sm:text-sm text-gray-700 leading-relaxed">
+                                Concordo com os 
+                                <a href="{{ url_for('termos_uso') }}" target="_blank" 
+                                   class="text-primary hover:text-secondary font-semibold underline transition-colors duration-200">
+                                    Termos de Uso
+                                </a>, 
+                                <a href="{{ url_for('politica_privacidade') }}" target="_blank" 
+                                   class="text-primary hover:text-secondary font-semibold underline transition-colors duration-200">
+                                    Política de Privacidade
+                                </a>
+                                e estou ciente do 
+                                <a href="{{ url_for('termo_arrependimento') }}" target="_blank" 
+                                   class="text-primary hover:text-secondary font-semibold underline transition-colors duration-200">
+                                    Termo de Arrependimento
+                                </a>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Submit -->
+                    <button type="submit"
+                            class="w-full bg-gradient-to-r from-primary to-secondary 
+                                   text-white py-3 sm:py-4 px-4 rounded-2xl 
+                                   hover:shadow-2xl transition-all duration-300 
+                                   font-bold text-sm sm:text-base lg:text-lg
+                                   shadow-lg hover:scale-105
+                                   flex items-center justify-center space-x-2
+                                   focus:ring-4 focus:ring-primary focus:ring-opacity-50">
+                        <i class="fas fa-user-plus text-sm sm:text-base"></i>
+                        <span>Criar Minha Conta</span>
+                    </button>
+                </form>
+
+                <!-- Divisor -->
+                <div class="flex items-center my-6 sm:my-8">
+                    <div class="flex-1 border-t border-gray-300"></div>
+                    <span class="px-3 sm:px-4 text-gray-500 text-xs sm:text-sm">ou</span>
+                    <div class="flex-1 border-t border-gray-300"></div>
+                </div>
+
+                <!-- Link para Login -->
+                <div class="text-center">
+                    <p class="text-gray-600 text-sm sm:text-base">
+                        Já tem uma conta?
+                        <a href="{{ url_for('login') }}" 
+                           class="text-primary hover:text-secondary font-bold transition-colors duration-200 inline-flex items-center space-x-1">
+                            <span>Fazer Login</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cards Informativos (apenas desktop) -->
+        <div class="hidden lg:grid grid-cols-3 gap-4 mt-8">
+            <div class="bg-white rounded-2xl p-4 text-center shadow-lg border border-gray-200">
+                <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-shield-alt text-green-600 text-sm"></i>
+                </div>
+                <p class="text-xs text-gray-600 font-semibold">Segurança</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 text-center shadow-lg border border-gray-200">
+                <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-rocket text-blue-600 text-sm"></i>
+                </div>
+                <p class="text-xs text-gray-600 font-semibold">Performance</p>
+            </div>
+            <div class="bg-white rounded-2xl p-4 text-center shadow-lg border border-gray-200">
+                <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <i class="fas fa-users text-purple-600 text-sm"></i>
+                </div>
+                <p class="text-xs text-gray-600 font-semibold">Comunidade</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Função para mostrar/ocultar senha
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const icon = document.getElementById(fieldId + 'EyeIcon');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        field.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+// Validação em tempo real
+document.addEventListener('DOMContentLoaded', function() {
+    const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
+    
+    inputs.forEach(input => {
+        input.addEventListener('input', function() {
+            const parentGroup = this.closest('.group');
+            const checkIcon = this.parentNode.querySelector('.fa-check-circle');
+            
+            if (this.value.length > 0) {
+                this.classList.add('border-green-500');
+                checkIcon.classList.add('opacity-100');
+                checkIcon.classList.remove('opacity-0');
+            } else {
+                this.classList.remove('border-green-500');
+                checkIcon.classList.remove('opacity-100');
+                checkIcon.classList.add('opacity-0');
+            }
+        });
+        
+        // Efeito de foco personalizado
+        input.addEventListener('focus', function() {
+            this.parentNode.classList.add('ring-4', 'ring-primary', 'ring-opacity-20');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.parentNode.classList.remove('ring-4', 'ring-primary', 'ring-opacity-20');
+        });
+    });
+    
+    // Efeito de shake para erro
+    {% if error %}
+    const errorDiv = document.querySelector('.animate-shake');
+    if (errorDiv) {
+        errorDiv.classList.add('animate-shake');
+        setTimeout(() => {
+            errorDiv.classList.remove('animate-shake');
+        }, 1000);
+    }
+    {% endif %}
+});
+</script>
+
+<style>
+/* Animações personalizadas */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
+}
+
+/* Melhorias de acessibilidade */
+@media (max-width: 640px) {
+    .min-h-screen {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        align-items: flex-start;
+    }
+}
+
+/* Estados de foco melhorados */
+input:focus {
+    outline: none;
+    transform: translateY(-2px);
+}
+
+/* Transições suaves */
+* {
+    transition-property: color, background-color, border-color, transform, box-shadow;
+    transition-duration: 200ms;
+    transition-timing-function: ease-in-out;
+}
+
+/* Scroll suave */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Melhorias para telas muito pequenas */
+@media (max-width: 360px) {
+    .px-4 {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+    
+    .text-2xl {
+        font-size: 1.5rem;
+    }
+}
+
+/* Loading state para o botão */
+button[type="submit"]:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Placeholder animado */
+input::placeholder {
+    transition: opacity 0.3s ease;
+}
+
+input:focus::placeholder {
+    opacity: 0.5;
+}
+</style>
+{% endblock %}

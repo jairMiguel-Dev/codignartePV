@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+            Trilha de Aprendizado
+        </h1>
+        <p class="text-gray-600 text-lg">
+            Aprenda JavaScript de forma organizada! Cada módulo tem um desafio final para testar seu conhecimento.
+        </p>
+    </div>
+
+    <!-- Progresso Geral -->
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Seu Progresso</h2>
+            <div class="flex items-center space-x-4">
+                <span class="bg-primary text-white px-4 py-2 rounded-full font-semibold">
+                    {{ current_user.nivel_atual|title }}
+                </span>
+                {% if premium %}
+                <span class="bg-premium text-yellow-900 px-3 py-1 rounded-full text-sm font-bold">
+                    <i class="fas fa-crown mr-1"></i>PREMIUM
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-6 text-center">
+            <div class="bg-blue-50 p-6 rounded-xl">
+                <div class="text-3xl font-bold text-blue-600 mb-2">{{ modulos.iniciante|selectattr('concluido')|list|length }}/{{ modulos.iniciante|length }}</div>
+                <div class="text-blue-800 font-semibold">Módulos Iniciante</div>
+            </div>
+            <div class="bg-green-50 p-6 rounded-xl">
+                <div class="text-3xl font-bold text-green-600 mb-2">{{ modulos.intermediario|selectattr('concluido')|list|length }}/{{ modulos.intermediario|length }}</div>
+                <div class="text-green-800 font-semibold">Módulos Intermediário</div>
+            </div>
+            <div class="bg-purple-50 p-6 rounded-xl">
+                <div class="text-3xl font-bold text-purple-600 mb-2">{{ modulos.avancado|selectattr('concluido')|list|length }}/{{ modulos.avancado|length }}</div>
+                <div class="text-purple-800 font-semibold">Módulos Avançado</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Níveis -->
+    {% for nivel, lista_modulos in modulos.items() %}
+    <div class="mb-12">
+        <div class="flex items-center mb-6">
+            <div class="w-3 h-8 bg-{{ 'blue' if nivel == 'iniciante' else 'green' if nivel == 'intermediario' else 'purple' }}-500 rounded-full mr-4"></div>
+            <h2 class="text-3xl font-bold text-gray-800">{{ nivel|title }}</h2>
+            <span class="ml-4 bg-{{ 'blue' if nivel == 'iniciante' else 'green' if nivel == 'intermediario' else 'purple' }}-100 text-{{ 'blue' if nivel == 'iniciante' else 'green' if nivel == 'intermediario' else 'purple' }}-800 px-3 py-1 rounded-full text-sm font-medium">
+                {{ lista_modulos|length }} módulos
+            </span>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            {% for modulo in lista_modulos %}
+            <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 border-2 {{ 'border-green-500' if modulo.concluido else 'border-gray-200' }}">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 bg-gradient-to-r from-{{ 'blue' if nivel == 'iniciante' else 'green' if nivel == 'intermediario' else 'purple' }}-500 to-{{ 'blue' if nivel == 'iniciante' else 'green' if nivel == 'intermediario' else 'purple' }}-600 rounded-xl flex items-center justify-center">
+                            <i class="{{ modulo.icone }} text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">{{ modulo.nome }}</h3>
+                            <p class="text-gray-600 text-sm">{{ modulo.descricao }}</p>
+                        </div>
+                    </div>
+                    
+                    {% if modulo.concluido %}
+                    <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                        <i class="fas fa-check mr-1"></i>Concluído
+                    </span>
+                    {% endif %}
+                </div>
+
+                <!-- Barra de Progresso -->
+                <div class="mb-4">
+                    <div class="flex justify-between text-sm text-gray-600 mb-2">
+                        <span>Progresso</span>
+                        <span>{{ modulo.exercicios_completos }}/{{ modulo.total_exercicios }} exercícios</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3">
+                        <div class="bg-{{ 'green' if modulo.concluido else 'blue' if nivel == 'iniciante' else 'green' if nivel == 'intermediario' else 'purple' }}-500 h-3 rounded-full transition-all duration-500" 
+                             style="width: {{ modulo.progresso_percent }}%"></div>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">
+                        {% if modulo.concluido %}
+                        <i class="fas fa-trophy text-yellow-500 mr-1"></i>Desafio final conquistado!
+                        {% elif modulo.exercicios_completos > 0 %}
+                        {{ modulo.progresso_percent }}% completo
+                        {% else %}
+                        Não iniciado
+                        {% endif %}
+                    </span>
+                    
+                    <a href="{{ url_for('ver_modulo', modulo_id=modulo.id) }}" 
+                       class="bg-{{ 'blue' if nivel == 'iniciante' else 'green' if nivel == 'intermediario' else 'purple' }}-500 text-white px-6 py-2 rounded-lg hover:bg-{{ 'blue' if nivel == 'iniciante' else 'green' if nivel == 'intermediario' else 'purple' }}-600 transition duration-150 font-semibold">
+                        {% if modulo.concluido %}
+                        <i class="fas fa-redo mr-2"></i>Revisar
+                        {% else %}
+                        <i class="fas fa-play mr-2"></i>Continuar
+                        {% endif %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <!-- Benefícios Premium -->
+    {% if not premium %}
+    <div class="bg-gradient-to-r from-premium to-yellow-400 rounded-2xl shadow-lg p-8 text-center">
+        <h3 class="text-2xl font-bold text-white mb-4">🚀 Acelere Seu Aprendizado com Premium!</h3>
+        <div class="grid md:grid-cols-3 gap-6 mb-6">
+            <div class="bg-white bg-opacity-20 p-4 rounded-xl">
+                <i class="fas fa-infinity text-white text-2xl mb-2"></i>
+                <h4 class="font-semibold text-white">Vidas Ilimitadas</h4>
+                <p class="text-white text-sm opacity-90">Estude sem interrupções</p>
+            </div>
+            <div class="bg-white bg-opacity-20 p-4 rounded-xl">
+                <i class="fas fa-graduation-cap text-white text-2xl mb-2"></i>
+                <h4 class="font-semibold text-white">Conteúdo Exclusivo</h4>
+                <p class="text-white text-sm opacity-90">Exercícios avançados</p>
+            </div>
+            <div class="bg-white bg-opacity-20 p-4 rounded-xl">
+                <i class="fas fa-rocket text-white text-2xl mb-2"></i>
+                <h4 class="font-semibold text-white">Progresso Rápido</h4>
+                <p class="text-white text-sm opacity-90">Avance sem esperas</p>
+            </div>
+        </div>
+        <a href="{{ url_for('loja') }}" class="bg-white text-premium px-8 py-3 rounded-xl hover:bg-gray-100 transition duration-150 font-bold text-lg">
+            <i class="fas fa-crown mr-2"></i>Experimente Premium
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,316 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Meu Dashboard
+        </h1>
+        <p class="text-gray-600 mt-2">Resumo do seu progresso e atividades</p>
+    </div>
+
+    <!-- Welcome Message for New Users -->
+    {% if novo_usuario %}
+    <div class="bg-gradient-to-r from-primary to-secondary text-white rounded-2xl shadow-lg p-8 mb-8 text-center animate-fade-in">
+        <div class="w-20 h-20 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-rocket text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-bold mb-4">Bem-vindo ao Codignarte! 🎉</h2>
+        <p class="text-lg opacity-90 mb-6">
+            Pronto para começar sua jornada em JavaScript? 
+            Seu primeiro exercício está te esperando!
+        </p>
+        <a href="{{ url_for('comecar_agora') }}" 
+           class="bg-white text-primary px-8 py-4 rounded-xl hover:bg-gray-100 transition duration-150 font-semibold text-lg shadow-lg hover:shadow-xl inline-block">
+            <i class="fas fa-play mr-2"></i>Começar Agora
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- Premium Status Banner -->
+    {% if premium %}
+    <div class="bg-gradient-to-r from-premium to-yellow-400 text-white rounded-2xl shadow-lg p-6 mb-8">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <div class="flex items-center space-x-4 mb-4 md:mb-0">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-crown text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">Conta Premium Ativa</h3>
+                    {% if current_user.data_expiracao_premium %}
+                    <p class="opacity-90">Válido até: {{ current_user.data_expiracao_premium.strftime('%d/%m/%Y') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="flex space-x-3">
+                <a href="{{ url_for('conteudo_premium') }}" 
+                   class="bg-white text-premium px-4 py-2 rounded-lg hover:bg-gray-100 transition duration-150 font-semibold text-sm">
+                    Conteúdo Exclusivo
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Main Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <!-- Progress Card -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg animate-slide-up" style="animation-delay: 0.1s">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Progresso</h3>
+                <i class="fas fa-chart-line text-primary"></i>
+            </div>
+            <div class="text-3xl font-bold text-gray-800 mb-2">{{ exercicios_completos }}/6</div>
+            <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-primary h-2 rounded-full transition-all duration-500" 
+                     style="width: {{ (exercicios_completos / 6 * 100) if 6 > 0 else 0 }}%"></div>
+            </div>
+            <p class="text-sm text-gray-500 mt-2">{{ ((exercicios_completos / 6 * 100) if 6 > 0 else 0)|round|int }}% completo</p>
+        </div>
+
+        <!-- Lives Card -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg animate-slide-up" style="animation-delay: 0.2s">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Vidas</h3>
+                <i class="fas fa-heart text-danger"></i>
+            </div>
+            <div class="text-3xl font-bold text-gray-800 mb-2">
+                {% if premium %}∞{% else %}{{ vidas }}/3{% endif %}
+            </div>
+            <div class="flex space-x-1 mb-2">
+                {% for i in range(3) %}
+                    {% if premium or i < vidas %}
+                    <i class="fas fa-heart text-danger"></i>
+                    {% else %}
+                    <i class="fas fa-heart text-gray-300"></i>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% if not premium and vidas < 3 %}
+            <p class="text-sm text-gray-500">
+                Próxima: <span id="tempo-restante-dashboard">
+                    {% if tempo_restante > 0 %}
+                        {{ "%02d:%02d" | format(tempo_restante // 60, tempo_restante % 60) }}
+                    {% else %}
+                        Pronta!
+                    {% endif %}
+                </span>
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Quick Actions Card -->
+        <div class="bg-white p-6 rounded-2xl shadow-lg animate-slide-up" style="animation-delay: 0.3s">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold text-gray-700">Ações Rápidas</h3>
+                <i class="fas fa-bolt text-warning"></i>
+            </div>
+            <div class="space-y-3">
+                {% if exercicios_completos == 0 %}
+                <a href="{{ url_for('comecar_agora') }}" 
+                   class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-secondary transition duration-150 font-semibold text-sm text-center block">
+                    <i class="fas fa-play mr-2"></i>Primeiro Exercício
+                </a>
+                {% else %}
+                <a href="{{ url_for('lista_exercicios') }}" 
+                   class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-secondary transition duration-150 font-semibold text-sm text-center block">
+                    <i class="fas fa-play-circle mr-2"></i>Continuar Estudando
+                </a>
+                {% endif %}
+                
+                {% if not premium %}
+                <a href="{{ url_for('loja') }}" 
+                   class="w-full border border-premium text-premium py-2 px-4 rounded-lg hover:bg-premium hover:text-white transition duration-150 font-semibold text-sm text-center block">
+                    <i class="fas fa-crown mr-2"></i>Fazer Upgrade
+                </a>
+                {% else %}
+                <a href="{{ url_for('conteudo_premium') }}" 
+                   class="w-full border border-premium text-premium py-2 px-4 rounded-lg hover:bg-premium hover:text-white transition duration-150 font-semibold text-sm text-center block">
+                    <i class="fas fa-star mr-2"></i>Conteúdo Exclusivo
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+        <!-- Recent Transactions -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold text-gray-800">Transações Recentes</h2>
+                <a href="{{ url_for('minhas_compras') }}" class="text-primary hover:text-secondary text-sm font-semibold">
+                    Ver todas
+                </a>
+            </div>
+            
+            {% if transacoes %}
+            <div class="space-y-4">
+                {% for transacao in transacoes[:3] %}
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        {% if transacao.status == 'confirmada' %}
+                        <div class="w-8 h-8 bg-success rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white text-xs"></i>
+                        </div>
+                        {% elif transacao.status == 'reembolsada' %}
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+                            <i class="fas fa-undo text-white text-xs"></i>
+                        </div>
+                        {% else %}
+                        <div class="w-8 h-8 bg-warning rounded-full flex items-center justify-center">
+                            <i class="fas fa-clock text-white text-xs"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div>
+                            <p class="font-medium text-gray-700 text-sm">{{ transacao.detalhes[:30] }}...</p>
+                            <p class="text-xs text-gray-500">{{ transacao.data_transacao.strftime('%d/%m') }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="text-right">
+                        <p class="font-semibold text-gray-800 text-sm">R$ {{ "%.2f"|format(transacao.valor) }}</p>
+                        <p class="text-xs text-gray-500">{{ transacao.id_publico }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-6">
+                <i class="fas fa-receipt text-gray-300 text-3xl mb-3"></i>
+                <p class="text-gray-500 text-sm">Nenhuma transação</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Progress Overview -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h2 class="text-xl font-bold text-gray-800 mb-6">Visão Geral</h2>
+            
+            <div class="space-y-4">
+                <!-- Next Lesson -->
+                <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-graduation-cap text-blue-500"></i>
+                        <div>
+                            <p class="font-medium text-gray-700 text-sm">Próxima Lição</p>
+                            <p class="text-xs text-gray-500">
+                                {% if exercicios_completos < 6 %}
+                                    Conceito {{ exercicios_completos + 1 }}
+                                {% else %}
+                                    Tudo completo! 🎉
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-bold">
+                        {% if exercicios_completos < 6 %}
+                            Disponível
+                        {% else %}
+                            Concluído
+                        {% endif %}
+                    </span>
+                </div>
+
+                <!-- Premium Status -->
+                <div class="flex items-center justify-between p-3 bg-premium bg-opacity-10 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-crown text-premium"></i>
+                        <div>
+                            <p class="font-medium text-gray-700 text-sm">Status Premium</p>
+                            <p class="text-xs text-gray-500">
+                                {% if premium %}
+                                    Ativo
+                                {% else %}
+                                    Gratuito
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="{% if premium %}bg-premium text-yellow-900{% else %}bg-gray-100 text-gray-600{% endif %} px-2 py-1 rounded text-xs font-bold">
+                        {% if premium %}
+                            Premium
+                        {% else %}
+                            Free
+                        {% endif %}
+                    </span>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                    <div class="flex items-center space-x-3">
+                        <i class="fas fa-fire text-success"></i>
+                        <div>
+                            <p class="font-medium text-gray-700 text-sm">Atividade</p>
+                            <p class="text-xs text-gray-500">
+                                {% if exercicios_completos > 0 %}
+                                    {{ exercicios_completos }} exercícios
+                                {% else %}
+                                    Comece agora!
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">
+                        {% if exercicios_completos > 0 %}
+                            Ativo
+                        {% else %}
+                            Novo
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    {% if not premium %}
+    <div class="bg-gradient-to-r from-premium to-yellow-400 rounded-2xl shadow-lg p-6 text-center">
+        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+            <div class="text-center md:text-left">
+                <h3 class="text-xl font-bold text-white mb-2">🚀 Upgrade para Premium</h3>
+                <p class="text-white opacity-90">
+                    Vidas infinitas, conteúdo exclusivo e muito mais!
+                </p>
+            </div>
+            <a href="{{ url_for('loja') }}" 
+               class="bg-white text-premium px-6 py-3 rounded-lg hover:bg-gray-100 transition duration-150 font-semibold whitespace-nowrap">
+                Ver Planos
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Função para cancelar assinatura
+async function cancelarAssinatura() {
+    if (!confirm('Tem certeza que deseja cancelar sua assinatura premium?\n\nO sistema verificará automaticamente se você tem direito a reembolso integral.')) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/cancelar_assinatura');
+        const data = await response.json();
+
+        if (data.success) {
+            if (data.reembolsado) {
+                alert('✅ ' + data.message + '\n\nID do Reembolso: ' + data.refund_id + '\nID da Transação: ' + data.transacao_id);
+            } else {
+                alert('ℹ️ ' + data.message);
+            }
+            setTimeout(() => {
+                location.reload();
+            }, 2000);
+        } else {
+            alert('❌ Erro: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('❌ Erro ao cancelar assinatura. Tente novamente.');
+    }
+}
+</script>
+{% endblock %}

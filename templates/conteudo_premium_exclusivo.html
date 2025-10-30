@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-premium to-yellow-400 bg-clip-text text-transparent">
+            Conteúdo Exclusivo Premium
+        </h1>
+        <p class="text-gray-600 mt-2">Acesse exercícios avançados e recursos especiais disponíveis apenas para assinantes</p>
+    </div>
+
+    <!-- Status Premium -->
+    <div class="bg-gradient-to-r from-premium to-yellow-400 text-white rounded-2xl shadow-lg p-6 mb-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                    <i class="fas fa-crown text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold">Acesso Premium Ativo</h3>
+                    {% if current_user.data_expiracao_premium %}
+                    <p class="opacity-90">
+                        Você tem acesso completo até: 
+                        <strong>{{ current_user.data_expiracao_premium.strftime('%d/%m/%Y') }}</strong>
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold">∞ Vidas</div>
+                <div class="text-sm opacity-90">Ilimitadas</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recursos Premium -->
+    <div class="grid md:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div class="w-16 h-16 bg-premium bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-headphones text-premium text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">Teoria em Áudio</h3>
+            <p class="text-gray-600">Ouça as explicações enquanto pratica</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div class="w-16 h-16 bg-premium bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-infinity text-premium text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">Vidas Ilimitadas</h3>
+            <p class="text-gray-600">Estude sem interrupções</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-lg text-center">
+            <div class="w-16 h-16 bg-premium bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-star text-premium text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-3">Conteúdo Exclusivo</h3>
+            <p class="text-gray-600">Exercícios avançados e conceitos complexos</p>
+        </div>
+    </div>
+
+    <!-- Lista de Exercícios Premium -->
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Exercícios Exclusivos</h2>
+            <span class="bg-premium text-white px-3 py-1 rounded-full text-sm font-bold">
+                {{ exercicios|length }} exercícios
+            </span>
+        </div>
+
+        {% if exercicios %}
+        <div class="space-y-4">
+            {% for exercicio in exercicios %}
+            <div class="border border-premium border-opacity-30 rounded-2xl p-6 hover:shadow-lg transition duration-150">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        {% if exercicio.id in exercicios_completos_ids %}
+                        <div class="w-10 h-10 bg-success rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-white"></i>
+                        </div>
+                        {% else %}
+                        <div class="w-10 h-10 bg-premium rounded-full flex items-center justify-center">
+                            <span class="text-white font-semibold">{{ loop.index }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="flex-1">
+                            <h3 class="font-semibold text-gray-800 text-lg mb-2">{{ exercicio.pergunta }}</h3>
+                            <div class="flex items-center space-x-3">
+                                <span class="px-3 py-1 bg-premium bg-opacity-20 text-premium text-sm rounded-full font-medium">
+                                    {{ exercicio.nivel }}
+                                </span>
+                                <span class="px-3 py-1 bg-premium text-white text-sm rounded-full font-medium">
+                                    <i class="fas fa-crown mr-1"></i>EXCLUSIVO
+                                </span>
+                                {% if exercicio.teoria_audio %}
+                                <span class="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-medium">
+                                    <i class="fas fa-headphones mr-1"></i>Áudio
+                                </span>
+                                {% endif %}
+                                {% if exercicio.id in exercicios_completos_ids %}
+                                <span class="px-3 py-1 bg-success bg-opacity-20 text-success text-sm rounded-full font-medium">
+                                    <i class="fas fa-check mr-1"></i>Completo
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        {% if exercicio.id in exercicios_completos_ids %}
+                        <span class="text-success font-semibold text-lg">
+                            <i class="fas fa-check-circle mr-1"></i>Concluído
+                        </span>
+                        {% endif %}
+                        
+                        <a href="{{ url_for('exercicio', exercicio_id=exercicio.id) }}" 
+                           class="bg-premium text-white px-6 py-3 rounded-xl hover:bg-yellow-500 transition duration-150 font-semibold text-lg">
+                            {% if exercicio.id in exercicios_completos_ids %}
+                            <i class="fas fa-redo mr-2"></i>Refazer
+                            {% else %}
+                            <i class="fas fa-play mr-2"></i>Iniciar
+                            {% endif %}
+                        </a>
+                    </div>
+                </div>
+                
+                <!-- Teoria Preview -->
+                <div class="mt-4 p-4 bg-gray-50 rounded-lg">
+                    <h4 class="font-semibold text-gray-700 mb-2 flex items-center">
+                        <i class="fas fa-lightbulb text-premium mr-2"></i>
+                        Teoria Rápida
+                    </h4>
+                    <p class="text-gray-600 text-sm">{{ exercicio.teoria[:150] }}...</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <div class="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-star text-gray-400 text-3xl"></i>
+            </div>
+            <h3 class="text-2xl font-semibold text-gray-600 mb-2">Em Breve!</h3>
+            <p class="text-gray-500 max-w-md mx-auto">
+                Estamos preparando conteúdos exclusivos incríveis para você. 
+                Novos exercícios premium serão adicionados em breve!
+            </p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Progresso -->
+    <div class="grid md:grid-cols-2 gap-8">
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Seu Progresso Premium</h3>
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-gray-700 font-medium">Exercícios Completos</span>
+                <span class="text-premium font-bold text-2xl">
+                    {{ exercicios_completos_ids|length }}/{{ exercicios|length }}
+                </span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                <div class="bg-premium h-4 rounded-full transition-all duration-500" 
+                     style="width: {{ (exercicios_completos_ids|length / exercicios|length * 100) if exercicios|length > 0 else 0 | round | int }}%"></div>
+            </div>
+            <p class="text-sm text-gray-500 text-center">
+                {{ ((exercicios_completos_ids|length / exercicios|length * 100) if exercicios|length > 0 else 0) | round | int }}% concluído
+            </p>
+        </div>
+
+        <div class="bg-gradient-to-br from-premium to-yellow-500 text-white rounded-2xl shadow-lg p-6">
+            <h3 class="text-xl font-bold mb-4">Benefícios Ativos</h3>
+            <ul class="space-y-3">
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-3 text-white"></i>
+                    <span>Vidas infinitas</span>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-3 text-white"></i>
+                    <span>Teoria em áudio</span>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-3 text-white"></i>
+                    <span>Conteúdos exclusivos</span>
+                </li>
+                <li class="flex items-center">
+                    <i class="fas fa-check-circle mr-3 text-white"></i>
+                    <span>Sem tempo de espera</span>
+                </li>
+            </ul>
+            {% if current_user.data_expiracao_premium %}
+            <div class="mt-4 pt-4 border-t border-yellow-400 border-opacity-30">
+                <p class="text-sm opacity-90">
+                    Próxima renovação: 
+                    <strong>{{ current_user.data_expiracao_premium.strftime('%d/%m/%Y') }}</strong>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="mt-8 text-center">
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+            <h3 class="text-xl font-semibold text-blue-800 mb-2">📚 Quer mais conteúdo?</h3>
+            <p class="text-blue-600 mb-4">
+                Tem alguma sugestão de exercício ou conceito que gostaria de ver aqui?
+            </p>
+            <button class="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition duration-150 font-semibold">
+                <i class="fas fa-envelope mr-2"></i>Enviar Sugestão
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

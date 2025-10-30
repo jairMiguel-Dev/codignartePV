@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header do Módulo -->
+    <div class="bg-white rounded-2xl shadow-lg p-8 mb-8">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-xl flex items-center justify-center">
+                    <i class="{{ modulo.icone }} text-white text-2xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">{{ modulo.nome }}</h1>
+                    <p class="text-gray-600">{{ modulo.descricao }}</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <div class="text-2xl font-bold text-primary">
+                    {{ progresso|selectattr('concluido')|list|length }}/{{ progresso|length }}
+                </div>
+                <div class="text-gray-500">exercícios concluídos</div>
+            </div>
+        </div>
+
+        <!-- Barra de Progresso Geral -->
+        <div class="mb-4">
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Progresso do Módulo</span>
+                <span>{{ (progresso|selectattr('concluido')|list|length / progresso|length * 100)|round|int }}%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-primary h-4 rounded-full transition-all duration-500" 
+                     style="width: {{ (progresso|selectattr('concluido')|list|length / progresso|length * 100)|round|int }}%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Exercícios -->
+    <div class="space-y-4">
+        {% for item in progresso %}
+        {% set exercicio = item.exercicio %}
+        <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition duration-150 p-6 border-2 {{ 'border-green-500' if item.concluido else 'border-gray-200' }}">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    {% if item.concluido %}
+                    <div class="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-check text-white text-lg"></i>
+                    </div>
+                    {% else %}
+                    <div class="w-12 h-12 bg-gray-200 rounded-xl flex items-center justify-center">
+                        <span class="text-gray-600 font-bold text-lg">{{ loop.index }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div>
+                        <h3 class="text-lg font-semibold text-gray-800">{{ exercicio.pergunta }}</h3>
+                        <div class="flex items-center space-x-2 mt-1">
+                            {% if exercicio.premium %}
+                            <span class="bg-premium text-yellow-900 px-2 py-1 rounded-full text-xs font-bold">
+                                <i class="fas fa-crown mr-1"></i>PREMIUM
+                            </span>
+                            {% endif %}
+                            {% if exercicio.eh_desafio_final %}
+                            <span class="bg-purple-500 text-white px-2 py-1 rounded-full text-xs font-bold">
+                                <i class="fas fa-flag mr-1"></i>DESAFIO FINAL
+                            </span>
+                            {% endif %}
+                            {% if item.tentativas > 0 %}
+                            <span class="text-gray-500 text-sm">
+                                {{ item.tentativas }} tentativa{{ 's' if item.tentativas > 1 }}
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    {% if exercicio.premium and not premium %}
+                    <span class="text-premium font-semibold">
+                        <i class="fas fa-lock mr-1"></i>Premium
+                    </span>
+                    {% else %}
+                    <a href="{{ url_for('exercicio', exercicio_id=exercicio.id) }}" 
+                       class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-secondary transition duration-150 font-semibold">
+                        {% if item.concluido %}
+                        <i class="fas fa-redo mr-2"></i>Refazer
+                        {% else %}
+                        <i class="fas fa-play mr-2"></i>Iniciar
+                        {% endif %}
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Teoria Preview -->
+            {% if not item.concluido %}
+            <div class="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 class="font-semibold text-blue-800 mb-2 flex items-center">
+                    <i class="fas fa-lightbulb text-blue-500 mr-2"></i>
+                    O que você vai aprender:
+                </h4>
+                <p class="text-blue-700 text-sm">{{ exercicio.teoria[:200] }}...</p>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Navegação -->
+    <div class="mt-8 flex justify-between">
+        <a href="{{ url_for('modulos') }}" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition duration-150 font-semibold">
+            <i class="fas fa-arrow-left mr-2"></i>Voltar aos Módulos
+        </a>
+        
+        {% if progresso|selectattr('concluido')|list|length == progresso|length %}
+        <div class="bg-green-500 text-white px-6 py-3 rounded-lg font-semibold">
+            <i class="fas fa-trophy mr-2"></i>Módulo Concluído!
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
