@@ -5,9 +5,6 @@ Werkzeug==2.3.7
 stripe==5.5.0
 python-dotenv==1.0.0
 gunicorn==21.2.0
-<<<<<<< HEAD
 psycopg[binary]==3.2.1
-=======
 waitress==2.1.2
 aiohttp==3.8.5
->>>>>>> c38e7b2 (Preparando para deploy no Render)
