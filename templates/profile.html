@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="text-center mb-12">
+        <h1 class="text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Meu Perfil
+        </h1>
+        <p class="text-gray-600 mt-2">Gerencie suas informações pessoais</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Informações da Conta -->
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Informações da Conta</h2>
+                
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 border border-red-400 text-red-700{% else %}bg-green-100 border border-green-400 text-green-700{% endif %}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('update_profile') }}" class="space-y-6">
+                    <!-- Nome de Usuário -->
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
+                            Nome de Usuário
+                        </label>
+                        <input type="text" 
+                               id="username" 
+                               name="username" 
+                               value="{{ current_user.username }}" 
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-150">
+                    </div>
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                            Email
+                        </label>
+                        <input type="email" 
+                               id="email" 
+                               name="email" 
+                               value="{{ current_user.email }}" 
+                               required
+                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-150">
+                    </div>
+
+                    <!-- Data de Criação (Readonly) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            Data de Criação da Conta
+                        </label>
+                        <div class="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg text-gray-600">
+                            {{ current_user.data_criacao.strftime('%d/%m/%Y às %H:%M') }}
+                        </div>
+                        <p class="text-sm text-gray-500 mt-1">Sua conta foi criada nesta data</p>
+                    </div>
+
+                    <!-- Botão de Atualizar -->
+                    <button type="submit" 
+                            class="w-full bg-primary text-white py-3 px-6 rounded-lg hover:bg-secondary transition duration-150 font-semibold">
+                        <i class="fas fa-save mr-2"></i>Atualizar Perfil
+                    </button>
+                </form>
+            </div>
+
+            <!-- Seção de Exclusão de Conta -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mt-6 border border-red-200">
+                <h2 class="text-2xl font-bold text-red-700 mb-4">Zona de Perigo</h2>
+                <p class="text-gray-600 mb-4">
+                    Ao excluir sua conta, todos os seus dados serão permanentemente removidos, incluindo:
+                </p>
+                <ul class="list-disc list-inside text-gray-600 mb-6 space-y-2">
+                    <li>Seu progresso nos exercícios</li>
+                    <li>Histórico de transações</li>
+                    <li>Módulos concluídos</li>
+                    <li>Informações pessoais</li>
+                </ul>
+                <p class="text-red-600 font-semibold mb-4">
+                    ⚠️ Esta ação não pode ser desfeita!
+                </p>
+
+                <!-- Botão para abrir modal de confirmação -->
+                <button type="button" 
+                        onclick="openDeleteModal()"
+                        class="w-full bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-700 transition duration-150 font-semibold">
+                    <i class="fas fa-trash mr-2"></i>Excluir Minha Conta
+                </button>
+            </div>
+        </div>
+
+        <!-- Sidebar com Estatísticas -->
+        <div class="lg:col-span-1">
+            <!-- Status da Conta -->
+            <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Status da Conta</h3>
+                
+                <div class="space-y-4">
+                    <!-- Status Premium -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Status Premium:</span>
+                        <span class="{% if current_user.is_premium_active %}bg-premium text-yellow-900{% else %}bg-gray-200 text-gray-700{% endif %} px-3 py-1 rounded-full text-sm font-bold">
+                            {% if current_user.is_premium_active %}
+                                <i class="fas fa-crown mr-1"></i>PREMIUM
+                            {% else %}
+                                FREE
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Vidas -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Vidas:</span>
+                        <span class="font-semibold text-gray-800">
+                            {% if current_user.is_premium_active %}∞{% else %}{{ current_user.vidas }}/3{% endif %}
+                        </span>
+                    </div>
+
+                    <!-- Exercícios Completos -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Exercícios Completos:</span>
+                        <span class="font-semibold text-gray-800">
+                            {{ current_user.progresso|length }}
+                        </span>
+                    </div>
+
+                    <!-- Módulos Concluídos -->
+                    <div class="flex items-center justify-between">
+                        <span class="text-gray-600">Módulos Concluídos:</span>
+                        <span class="font-semibold text-gray-800">
+                            {{ current_user.modulos_concluidos|length }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="bg-white rounded-2xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Ações Rápidas</h3>
+                
+                <div class="space-y-3">
+                    <a href="{{ url_for('dashboard') }}" 
+                       class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-secondary transition duration-150 font-semibold text-sm text-center block">
+                        <i class="fas fa-tachometer-alt mr-2"></i>Voltar ao Dashboard
+                    </a>
+                    
+                    <a href="{{ url_for('minhas_compras') }}" 
+                       class="w-full border border-primary text-primary py-2 px-4 rounded-lg hover:bg-primary hover:text-white transition duration-150 font-semibold text-sm text-center block">
+                        <i class="fas fa-receipt mr-2"></i>Minhas Compras
+                    </a>
+
+                    {% if not current_user.is_premium_active %}
+                    <a href="{{ url_for('loja') }}" 
+                       class="w-full border border-premium text-premium py-2 px-4 rounded-lg hover:bg-premium hover:text-white transition duration-150 font-semibold text-sm text-center block">
+                        <i class="fas fa-crown mr-2"></i>Fazer Upgrade
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+        <h3 class="text-2xl font-bold text-red-700 mb-4">Confirmar Exclusão</h3>
+        
+        <p class="text-gray-600 mb-6">
+            Tem certeza que deseja excluir sua conta? Esta ação é irreversível e todos os seus dados serão perdidos permanentemente.
+        </p>
+
+        <form method="POST" action="{{ url_for('delete_account') }}" id="deleteForm">
+            <div class="mb-4">
+                <label for="senha" class="block text-sm font-medium text-gray-700 mb-2">
+                    Digite sua senha para confirmar:
+                </label>
+                <input type="password" 
+                       id="senha" 
+                       name="senha" 
+                       required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent transition duration-150">
+            </div>
+
+            <div class="flex space-x-4">
+                <button type="button" 
+                        onclick="closeDeleteModal()"
+                        class="flex-1 bg-gray-300 text-gray-700 py-3 px-6 rounded-lg hover:bg-gray-400 transition duration-150 font-semibold">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="flex-1 bg-red-600 text-white py-3 px-6 rounded-lg hover:bg-red-700 transition duration-150 font-semibold">
+                    <i class="fas fa-trash mr-2"></i>Excluir Conta
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    }
+
+    // Fechar modal ao clicar fora
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeDeleteModal();
+        }
+    });
+
+    // Prevenir envio duplo do formulário
+    document.getElementById('deleteForm').addEventListener('submit', function(e) {
+        const button = this.querySelector('button[type="submit"]');
+        button.disabled = true;
+        button.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Excluindo...';
+    });
+</script>
+{% endblock %}
