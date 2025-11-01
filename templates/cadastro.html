@@ -35,7 +35,7 @@
                 </div>
                 {% endif %}
 
-                <form method="POST" class="space-y-4 sm:space-y-6">
+                <form method="POST" class="space-y-4 sm:space-y-6" id="cadastroForm">
                     <!-- Campo Username -->
                     <div class="group">
                         <label for="username" class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">
@@ -134,6 +134,7 @@
 
                     <!-- Botão de Submit -->
                     <button type="submit"
+                            id="submitBtn"
                             class="w-full bg-gradient-to-r from-primary to-secondary 
                                    text-white py-3 sm:py-4 px-4 rounded-2xl 
                                    hover:shadow-2xl transition-all duration-300 
@@ -191,6 +192,17 @@
     </div>
 </div>
 
+<!-- Overlay de Loading (inicialmente oculto) -->
+<div id="loadingOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center">
+    <div class="bg-white rounded-2xl p-8 text-center shadow-2xl transform scale-110">
+        <div class="w-16 h-16 bg-gradient-to-r from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4 animate-spin">
+            <i class="fas fa-spinner text-white text-xl"></i>
+        </div>
+        <p class="text-gray-800 font-semibold text-lg">Criando sua conta...</p>
+        <p class="text-gray-600 text-sm mt-2">Aguarde um momento</p>
+    </div>
+</div>
+
 <script>
 // Função para mostrar/ocultar senha
 function togglePassword(fieldId) {
@@ -208,8 +220,16 @@ function togglePassword(fieldId) {
     }
 }
 
-// Validação em tempo real
+// CORREÇÃO PRINCIPAL: Gerenciamento do formulário
 document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('cadastroForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    
+    // Limpar qualquer estado residual de modals/overlays
+    cleanupPageState();
+    
+    // Validação em tempo real
     const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"]');
     
     inputs.forEach(input => {
@@ -219,12 +239,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (this.value.length > 0) {
                 this.classList.add('border-green-500');
-                checkIcon.classList.add('opacity-100');
-                checkIcon.classList.remove('opacity-0');
+                if (checkIcon) {
+                    checkIcon.classList.add('opacity-100');
+                    checkIcon.classList.remove('opacity-0');
+                }
             } else {
                 this.classList.remove('border-green-500');
-                checkIcon.classList.remove('opacity-100');
-                checkIcon.classList.add('opacity-0');
+                if (checkIcon) {
+                    checkIcon.classList.remove('opacity-100');
+                    checkIcon.classList.add('opacity-0');
+                }
             }
         });
         
@@ -238,6 +262,27 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+    // CORREÇÃO: Submit do formulário
+    form.addEventListener('submit', function(e) {
+        // Prevenir comportamento padrão
+        e.preventDefault();
+        
+        // Mostrar loading
+        showLoading();
+        
+        // Desabilitar botão
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin text-sm sm:text-base"></i><span>Criando conta...</span>';
+            submitBtn.classList.remove('hover:scale-105', 'hover:shadow-2xl');
+        }
+        
+        // Fazer submit após pequeno delay para mostrar o loading
+        setTimeout(() => {
+            form.submit();
+        }, 500);
+    });
+    
     // Efeito de shake para erro
     {% if error %}
     const errorDiv = document.querySelector('.animate-shake');
@@ -246,8 +291,78 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             errorDiv.classList.remove('animate-shake');
         }, 1000);
+        
+        // Se houve erro, garantir que o botão esteja reativado
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-user-plus text-sm sm:text-base"></i><span>Criar Minha Conta</span>';
+            submitBtn.classList.add('hover:scale-105', 'hover:shadow-2xl');
+        }
+        
+        // Esconder loading se houver erro
+        hideLoading();
     }
     {% endif %}
+});
+
+// Função para mostrar loading
+function showLoading() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.classList.remove('hidden');
+        loadingOverlay.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+// Função para esconder loading
+function hideLoading() {
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    if (loadingOverlay) {
+        loadingOverlay.classList.add('hidden');
+        loadingOverlay.classList.remove('flex');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+// CORREÇÃO CRÍTICA: Limpar estado da página
+function cleanupPageState() {
+    // Remover todos os overlays/modal backdrops
+    const backdrops = document.querySelectorAll('.modal-backdrop, .bg-black, [class*="overlay"]');
+    backdrops.forEach(backdrop => {
+        if (backdrop && backdrop.parentNode) {
+            backdrop.parentNode.removeChild(backdrop);
+        }
+    });
+    
+    // Remover classes de modal do body
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = 'auto';
+    document.body.style.paddingRight = '';
+    document.body.style.position = 'static';
+    
+    // Fechar todos os modals
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+    });
+    
+    // Garantir que o overlay de loading esteja oculto
+    hideLoading();
+}
+
+// CORREÇÃO: Limpar estado quando a página carregar
+window.addEventListener('load', cleanupPageState);
+
+// CORREÇÃO: Limpar estado quando a página for descarregada (navegação)
+window.addEventListener('beforeunload', cleanupPageState);
+
+// CORREÇÃO: Prevenir que modals fiquem abertos
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cleanupPageState();
+    }
 });
 </script>
 
@@ -316,6 +431,27 @@ input::placeholder {
 
 input:focus::placeholder {
     opacity: 0.5;
+}
+
+/* CORREÇÃO: Garantir que overlays não bloqueiem */
+.modal-backdrop {
+    display: none !important;
+}
+
+body.modal-open {
+    overflow: auto !important;
+    padding-right: 0 !important;
+}
+
+/* CORREÇÃO: Z-index para garantir que o loading fique acima de tudo */
+#loadingOverlay {
+    z-index: 9999 !important;
+}
+
+/* CORREÇÃO: Garantir que o body esteja sempre funcional */
+body {
+    overflow: auto !important;
+    position: relative !important;
 }
 </style>
 {% endblock %}
