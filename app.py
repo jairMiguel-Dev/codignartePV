@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
 from models import db, Usuario, Exercicio, Progresso, Transacao, ModuloConcluido
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -324,6 +324,70 @@ def cadastro():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+# NOVA ROTA: Perfil do usuário
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html')
+
+# NOVA ROTA: Atualizar perfil
+@app.route('/update_profile', methods=['POST'])
+@login_required
+def update_profile():
+    username = request.form.get('username')
+    email = request.form.get('email')
+    
+    # Verificar se o novo username ou email já existem (excluindo o usuário atual)
+    usuario_existente = Usuario.query.filter(
+        (Usuario.email == email) | (Usuario.username == username)
+    ).filter(Usuario.id != current_user.id).first()
+    
+    if usuario_existente:
+        flash('Usuário ou email já estão em uso por outra conta.', 'error')
+        return redirect(url_for('profile'))
+    
+    # Atualizar os dados
+    current_user.username = username
+    current_user.email = email
+    
+    db.session.commit()
+    flash('Perfil atualizado com sucesso!', 'success')
+    return redirect(url_for('profile'))
+
+# NOVA ROTA: Excluir conta
+@app.route('/delete_account', methods=['POST'])
+@login_required
+def delete_account():
+    # Verificar senha
+    senha = request.form.get('senha')
+    if not check_password_hash(current_user.senha, senha):
+        flash('Senha incorreta. Não foi possível excluir a conta.', 'error')
+        return redirect(url_for('profile'))
+    
+    # Excluir todos os dados do usuário
+    try:
+        # Excluir progresso
+        Progresso.query.filter_by(usuario_id=current_user.id).delete()
+        
+        # Excluir módulos concluídos
+        ModuloConcluido.query.filter_by(usuario_id=current_user.id).delete()
+        
+        # Excluir transações
+        Transacao.query.filter_by(usuario_id=current_user.id).delete()
+        
+        # Excluir o usuário
+        db.session.delete(current_user)
+        db.session.commit()
+        
+        logout_user()
+        flash('Sua conta foi excluída com sucesso. Sentiremos sua falta!', 'success')
+        return redirect(url_for('index'))
+        
+    except Exception as e:
+        db.session.rollback()
+        flash('Erro ao excluir conta. Tente novamente.', 'error')
+        return redirect(url_for('profile'))
 
 @app.route('/modulos')
 @login_required
