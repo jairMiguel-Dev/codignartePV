@@ -6,15 +6,26 @@ from datetime import datetime, timedelta
 import stripe
 import os
 import random
-import asyncio
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
 
+# CONFIGURAÇÃO CORRIGIDA PARA POSTGRESQL NA RENDER
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    # Render usa 'postgres://' mas SQLAlchemy precisa de 'postgresql://'
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    print("✅ Conectado ao PostgreSQL da Render!")
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///codignarte.db'
+    print("🔧 Modo desenvolvimento: SQLite local")
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY') or os.urandom(24)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', 'sqlite:///codignarte.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
@@ -23,7 +34,7 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
 
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY')
 if not stripe.api_key:
-    raise ValueError("STRIPE_SECRET_KEY não configurada")
+    print("⚠️ AVISO: STRIPE_SECRET_KEY não configurada")
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET')
 
@@ -35,20 +46,12 @@ STRIPE_PRICE_IDS = {
 }
 
 print("=" * 60)
-print("🔍 VERIFICAÇÃO DAS VARIÁVEIS DE AMBIENTE")
+print("🔍 VERIFICAÇÃO DE CONFIGURAÇÃO")
 print("=" * 60)
-print(f"✅ SECRET_KEY: {'Configurado' if os.environ.get('SECRET_KEY') else '❌ NÃO CONFIGURADO'}")
-print(f"✅ DATABASE_URL: {'Configurado' if os.environ.get('DATABASE_URL') else '❌ NÃO CONFIGURADO'}")
+print(f"✅ Banco: {'PostgreSQL' if database_url else 'SQLite'}")
+print(f"✅ SECRET_KEY: {'Configurado' if os.environ.get('SECRET_KEY') else '⚠️ Usando aleatório'}")
 print(f"✅ STRIPE_SECRET_KEY: {'***' + stripe.api_key[-8:] if stripe.api_key else '❌ NÃO CONFIGURADO'}")
 print(f"✅ STRIPE_PUBLIC_KEY: {'***' + STRIPE_PUBLIC_KEY[-8:] if STRIPE_PUBLIC_KEY else '❌ NÃO CONFIGURADO'}")
-print(f"✅ STRIPE_WEBHOOK_SECRET: {'***' + STRIPE_WEBHOOK_SECRET[-8:] if STRIPE_WEBHOOK_SECRET else '❌ NÃO CONFIGURADO'}")
-
-print("\n🔍 PRICE IDs CONFIGURADOS:")
-for price_type, price_id in STRIPE_PRICE_IDS.items():
-    status = '✅' if price_id and price_id.startswith('price_') else '❌'
-    print(f"   {status} {price_type}: {price_id or 'NÃO CONFIGURADO'}")
-
-print("=" * 60)
 
 db.init_app(app)
 
@@ -373,8 +376,11 @@ def modulos():
 @app.route('/modulo/<string:modulo_id>')
 @login_required
 def ver_modulo(modulo_id):
+    print(f"🔍 Buscando exercícios para o módulo: {modulo_id}")
+    
     # Buscar exercícios do módulo em ordem
     exercicios = Exercicio.query.filter_by(modulo=modulo_id).order_by(Exercicio.ordem_no_modulo).all()
+    print(f"✅ Encontrados {len(exercicios)} exercícios para o módulo {modulo_id}")
     
     # Verificar progresso
     progresso_usuario = []
@@ -396,6 +402,10 @@ def ver_modulo(modulo_id):
             if mod['id'] == modulo_id:
                 modulo_info = mod
                 break
+    
+    if not modulo_info:
+        print(f"❌ Módulo {modulo_id} não encontrado na configuração")
+        return redirect(url_for('modulos'))
     
     return render_template('modulo_detalhes.html',
                          modulo=modulo_info,
@@ -1143,6 +1153,24 @@ def comecar_agora():
     else:
         return redirect(url_for('modulos'))
 
+@app.route('/db-status')
+def db_status():
+    db_url = app.config['SQLALCHEMY_DATABASE_URI']
+    
+    if 'postgresql' in db_url or 'postgres://' in db_url:
+        safe_url = db_url.split('@')[1] if '@' in db_url else db_url
+        return f"""
+        <h1>✅ PostgreSQL Conectado!</h1>
+        <p><strong>Banco:</strong> {safe_url}</p>
+        <p><strong>Status:</strong> Conectado ao PostgreSQL da Render</p>
+        """
+    else:
+        return f"""
+        <h1>❌ SQLite Detectado</h1>
+        <p><strong>URL:</strong> {db_url}</p>
+        <p><strong>Status:</strong> Ainda usando SQLite em produção</p>
+        """
+
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template('404.html'), 404
@@ -1161,64 +1189,7 @@ if __name__ == '__main__':
             
             # Criar dados iniciais de forma síncrona
             if not Exercicio.query.first():
-                exercicios = [
-                    Exercicio(
-                        pergunta="Qual é o resultado de 5 + 3? É tipo somar 5 reais com 3 reais na carteira!",
-                        codigo_exemplo="console.log(5 + 3);",
-                        resposta_correta="8",
-                        nivel="iniciante",
-                        teoria="O operador '+' é usado para adição em JavaScript, igual quando você soma dinheiro!",
-                        modulo='variaveis_operadores',
-                        ordem_no_modulo=1,
-                        dica="Pense em quanto dinheiro você teria se juntasse 5 reais com 3 reais!"
-                    ),
-                    Exercicio(
-                        pergunta="Como declarar uma variável chamada 'nome' em JavaScript? Tipo quando você guarda o nome de alguém na memória!",
-                        codigo_exemplo="// Declare a variável 'nome'\n___ nome;",
-                        resposta_correta="let",
-                        nivel="iniciante",
-                        teoria="Use 'let' para declarar variáveis que podem mudar, igual sua idade que muda todo ano!",
-                        modulo='variaveis_operadores',
-                        ordem_no_modulo=2,
-                        dica="Lembre-se: 'let' é como 'deixe' eu guardar este valor na memória!"
-                    ),
-                    Exercicio(
-                        pergunta="Qual é o resultado de 10 % 3? É tipo dividir 10 balas entre 3 amigos e ver quantas sobram!",
-                        codigo_exemplo="console.log(10 % 3);",
-                        resposta_correta="1",
-                        nivel="iniciante",
-                        teoria="O operador '%' retorna o resto da divisão. 10 dividido por 3 dá 3 e sobra 1!",
-                        modulo='variaveis_operadores',
-                        ordem_no_modulo=3,
-                        dica="Pense: se você tem 10 balas e 3 amigos, cada um fica com 3 balas e sobra 1!"
-                    ),
-                    Exercicio(
-                        pergunta="Complete o código para declarar uma constante 'PI' com o valor 3.14",
-                        codigo_exemplo="___ PI = 3.14;",
-                        resposta_correta="const",
-                        nivel="iniciante",
-                        teoria="Use 'const' para coisas que não mudam, igual seu nome ou a data do seu aniversário!",
-                        modulo='variaveis_operadores',
-                        ordem_no_modulo=4,
-                        dica="'const' é para constantes - coisas que são constantes, que não mudam!"
-                    ),
-                    Exercicio(
-                        pergunta="DESAFIO FINAL: Crie uma variável 'idade' com valor 20 e depois some 5. Imprima o resultado!",
-                        codigo_exemplo="// Crie a variável idade\n___ idade = 20;\n// Some 5\nidade = idade ___ 5;\n// Imprima a idade\nconsole.log(idade);",
-                        resposta_correta="let+",
-                        nivel="iniciante",
-                        teoria="Hora de juntar tudo que aprendemos! Variáveis e operadores trabalhando juntos!",
-                        modulo='variaveis_operadores',
-                        ordem_no_modulo=5,
-                        eh_desafio_final=True,
-                        dica="Primeiro declare a variável, depois some, depois imprima! Use 'let' e '+'"
-                    ),
-                ]
-                
-                for exercicio in exercicios:
-                    db.session.add(exercicio)
-                
-                db.session.commit()
+                criar_dados_iniciais()
                 print("✅ Dados iniciais criados com sucesso!")
         except Exception as e:
             print(f"❌ Erro na inicialização do banco: {str(e)}")
