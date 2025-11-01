@@ -2,279 +2,317 @@ import json
 from app import app, db
 from models import Exercicio
 from datetime import datetime
+import random
+
+class ExerciseGenerator:
+    """Gerador sofisticado de exercícios com IA simulada"""
+    
+    THEMES = {
+        'brasil': ['carnaval', 'futebol', 'samba', 'café', 'açaí', 'capoeira', 'feijoada'],
+        'tech': ['startup', 'hackathon', 'blockchain', 'machine learning', 'IoT'],
+        'games': ['minecraft', 'roblox', 'fortnite', 'valorant', 'league of legends'],
+        'vida_real': ['uber', 'ifood', 'nubank', 'whatsapp', 'instagram']
+    }
+    
+    @staticmethod
+    def generate_contextual_hint(pergunta, resposta):
+        """Gera dicas contextuais inteligentes baseadas no conteúdo"""
+        hints = {
+            'parseInt': '🤔 Pense em "parse" como analisar e "Int" como inteiro!',
+            'push': '📦 Imagine empurrando um item para o final da fila!',
+            'function': '🔧 Funções são como ferramentas que executam tarefas!',
+            'return': '↩️ É como devolver um resultado para quem pediu!',
+            'let': '🎯 "Let" em inglês significa "deixe" - deixe esta variável existir!',
+            'const': '🏛️ Constante é como um monumento - não muda!',
+            'await': '⏳ "Aguarde" até a promessa ser cumprida!',
+            'async': '⚡ Assíncrono = não precisa esperar na fila!'
+        }
+        return hints.get(resposta, '💡 Tente pensar no conceito por trás da operação!')
+    
+    @staticmethod
+    def generate_real_world_analogy(teoria):
+        """Adiciona analogias do mundo real para melhor aprendizado"""
+        analogies = [
+            "É como pedir um Uber - você chama e espera ele chegar!",
+            "Pense nisso como enviar uma mensagem no WhatsApp!",
+            "Imagine que é como fazer um pedido no iFood!",
+            "É tipo jogar um game - cada ação tem uma consequência!",
+            "Pense como organizar sua playlist do Spotify!"
+        ]
+        return teoria + " " + random.choice(analogies)
 
 def populate_exercises():
-    print("🏗️ Iniciando população do banco de dados com exercícios...")
+    """População sofisticada do banco com exercícios inovadores"""
+    print("🚀 INICIANDO POPULAÇÃO AVANÇADA DE EXERCÍCIOS...")
+    print("=" * 60)
     
     with app.app_context():
-        # Verificar se já existem exercícios para não duplicar
-        existing_count = Exercicio.query.count()
-        if existing_count > 6:  # Já temos os exercícios iniciais
-            print(f"✅ Banco já possui {existing_count} exercícios. Pulando população.")
+        # Limpar exercícios existentes para recriação completa
+        try:
+            deleted_count = Exercicio.query.delete()
+            db.session.commit()
+            print(f"🧹 {deleted_count} exercícios antigos removidos")
+        except Exception as e:
+            db.session.rollback()
+            print(f"❌ Erro ao limpar exercícios: {str(e)}")
             return
-        
-        exercicios = [
-            # ========== EXERCÍCIOS FREEMIUM ==========
-            {
-                'pergunta': 'Qual método converte uma string em número inteiro?',
-                'codigo_exemplo': 'let numero = ___("42");\nconsole.log(numero); // 42',
-                'resposta_correta': 'parseInt',
-                'nivel': 'iniciante',
-                'teoria': 'O método parseInt() converte uma string em um número inteiro. Ele para a leitura quando encontra um caractere não numérico.',
-                'premium': False,
-                'tipo': 'completion'
-            },
-            {
-                'pergunta': 'Como acessar o primeiro elemento de um array chamado "frutas"?',
-                'codigo_exemplo': 'let frutas = ["maçã", "banana", "laranja"];\nlet primeira = frutas[___];',
-                'resposta_correta': '0',
-                'nivel': 'iniciante',
-                'teoria': 'Arrays em JavaScript são indexados começando em 0. O primeiro elemento está na posição 0, o segundo na 1, e assim por diante.',
-                'premium': False,
-                'tipo': 'completion'
-            },
-            {
-                'pergunta': 'Qual será o output do código: console.log("10" + 5)?',
-                'codigo_exemplo': 'console.log("10" + 5);',
-                'resposta_correta': '105',
-                'nivel': 'iniciante',
-                'teoria': 'O operador "+" com string e número realiza concatenação. O número é convertido para string e as duas são juntadas.',
-                'premium': False,
-                'tipo': 'output'
-            },
-            {
-                'pergunta': 'Como verificar se uma variável "idade" é maior ou igual a 18?',
-                'codigo_exemplo': 'let idade = 20;\nif (idade ___ 18) {\n  console.log("Maior de idade");\n}',
-                'resposta_correta': '>=',
-                'nivel': 'iniciante',
-                'teoria': 'O operador ">=" verifica se o valor da esquerda é maior ou igual ao valor da direita.',
-                'premium': False,
-                'tipo': 'completion'
-            },
-            {
-                'pergunta': 'Qual método adiciona um elemento ao final de um array?',
-                'codigo_exemplo': 'let numeros = [1, 2, 3];\nnumeros.___(4);\n// numeros agora é [1, 2, 3, 4]',
-                'resposta_correta': 'push',
-                'nivel': 'iniciante',
-                'teoria': 'O método push() adiciona um ou mais elementos ao final de um array e retorna o novo comprimento do array.',
-                'premium': False,
-                'tipo': 'completion'
-            },
-            {
-                'pergunta': 'Qual é a diferença entre == e === em JavaScript?',
-                'codigo_exemplo': '',
-                'resposta_correta': '== compara valor, === compara valor e tipo',
-                'nivel': 'intermediario',
-                'teoria': 'O operador "==" faz conversão de tipo antes da comparação (coerção), enquanto "===" não faz conversão e exige que valor E tipo sejam iguais.',
-                'premium': False,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    '== compara valor, === compara valor e tipo',
-                    '== compara tipo, === compara valor',
-                    'Não há diferença',
-                    '== é mais rápido que ==='
-                ])
-            },
-            {
-                'pergunta': 'Como criar um objeto vazio em JavaScript?',
-                'codigo_exemplo': '',
-                'resposta_correta': 'let obj = {};',
-                'nivel': 'iniciante',
-                'teoria': 'Objetos em JavaScript podem ser criados usando chaves {}. Esta é a sintaxe de objeto literal, a forma mais comum de criar objetos.',
-                'premium': False,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'let obj = {};',
-                    'let obj = [];',
-                    'let obj = new Object;',
-                    'let obj = Object.create();'
-                ])
-            },
-            {
-                'pergunta': 'Qual método transforma um array em string?',
-                'codigo_exemplo': 'let frutas = ["maçã", "banana"];\nlet resultado = frutas.___(",");\n// resultado: "maçã,banana"',
-                'resposta_correta': 'join',
-                'nivel': 'intermediario',
-                'teoria': 'O método join() une todos os elementos de um array em uma string, usando um separador especificado.',
-                'premium': False,
-                'tipo': 'completion'
-            },
 
-            # ========== EXERCÍCIOS PREMIUM (Conteúdo Exclusivo) ==========
+        generator = ExerciseGenerator()
+        
+        # EXERCÍCIOS PREMIUM INOVADORES - Conteúdo Exclusivo
+        premium_exercises = [
             {
-                'pergunta': 'Como funciona o Event Loop em JavaScript?',
-                'codigo_exemplo': 'console.log("1");\nsetTimeout(() => console.log("2"), 0);\nconsole.log("3");\n// Qual a ordem de output?',
-                'resposta_correta': '1, 3, 2',
+                'pergunta': '🔥 DOM: Crie um efeito de digitação como ChatGPT',
+                'codigo_exemplo': 'async function typeWriter(elemento, texto) {\n  for (let i = 0; i < texto.length; i++) {\n    elemento.___ += texto[i];\n    await new Promise(resolve => setTimeout(resolve, 50));\n  }\n}',
+                'resposta_correta': 'textContent',
                 'nivel': 'avancado',
-                'teoria': 'O Event Loop é o mecanismo que permite JavaScript ser assíncrono. Ele gerencia a call stack, task queue e microtask queue. Funções síncronas executam primeiro, depois microtasks (Promises), e finalmente macrotasks (setTimeout).',
+                'teoria': generator.generate_real_world_analogy('textContent é mais performático que innerHTML para texto puro. Imagine cada letra aparecendo como numa máquina de escrever digital!'),
                 'premium': True,
-                'tipo': 'output'
+                'modulo': 'dom_manipulation',
+                'ordem_no_modulo': 1,
+                'dica': generator.generate_contextual_hint('textContent', 'textContent'),
+                'tipo': 'completion'
             },
             {
-                'pergunta': 'O que é Closure em JavaScript e como funciona?',
-                'codigo_exemplo': 'function criarContador() {\n  let count = 0;\n  return function() {\n    count++;\n    return count;\n  };\n}',
-                'resposta_correta': 'Função que lembra do escopo onde foi criada',
+                'pergunta': '🎮 Game Dev: Detecte colisão entre dois elementos',
+                'codigo_exemplo': 'function detectarColisão(elemento1, elemento2) {\n  const rect1 = elemento1.___();\n  const rect2 = elemento2.getBoundingClientRect();\n  return !(rect1.right < rect2.left || rect1.left > rect2.right);\n}',
+                'resposta_correta': 'getBoundingClientRect',
                 'nivel': 'avancado',
-                'teoria': 'Closure é quando uma função tem acesso a variáveis de um escopo externo mesmo após esse escopo ter sido removido da call stack. Isso permite criar funções com "estado privado" e é fundamental para muitos padrões em JavaScript.',
+                'teoria': generator.generate_real_world_analogy('getBoundingClientRect() retorna as coordenadas exatas de um elemento na tela. É como um GPS para elementos HTML!'),
                 'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'Função que lembra do escopo onde foi criada',
-                    'Função que fecha outras funções',
-                    'Método para fechar janelas',
-                    'Tipo de loop infinito'
-                ])
+                'modulo': 'dom_manipulation',
+                'ordem_no_modulo': 2,
+                'dica': generator.generate_contextual_hint('getBoundingClientRect', 'getBoundingClientRect'),
+                'tipo': 'completion'
             },
             {
-                'pergunta': 'Como funciona o Prototype Chain em JavaScript?',
-                'codigo_exemplo': 'function Animal(nome) {\n  this.nome = nome;\n}\nAnimal.prototype.falar = function() {\n  console.log(this.nome + " faz um som");\n};',
-                'resposta_correta': 'Mecanismo de herança baseado em protótipos',
+                'pergunta': '🤖 IA: Crie um chatbot com respostas inteligentes',
+                'codigo_exemplo': 'class Chatbot {\n  constructor() {\n    this.respostas = {\n      "ola": "Olá! Como posso ajudar?",\n      "nome": "Sou o BotCodignarte!"\n    };\n  }\n  responder(mensagem) {\n    return this.respostas[mensagem.___()] || "Não entendi!";\n  }\n}',
+                'resposta_correta': 'toLowerCase',
                 'nivel': 'avancado',
-                'teoria': 'JavaScript usa herança prototipal. Cada objeto tem um protótipo interno que pode ter seu próprio protótipo, formando uma cadeia. Quando uma propriedade não é encontrada no objeto, a busca sobe pela cadeia de protótipos.',
+                'teoria': generator.generate_real_world_analogy('toLowerCase() garante que o input do usuário seja padronizado. É como um tradutor que entende tanto "OLA" quanto "ola"!'),
                 'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'Mecanismo de herança baseado em protótipos',
-                    'Tipo de array especial',
-                    'Método para clonar objetos',
-                    'Sistema de versionamento'
-                ])
+                'modulo': 'programacao_assincrona',
+                'ordem_no_modulo': 1,
+                'dica': generator.generate_contextual_hint('toLowerCase', 'toLowerCase'),
+                'tipo': 'completion'
             },
             {
-                'pergunta': 'Qual a diferença entre call, apply e bind?',
-                'codigo_exemplo': 'function saudacao(periodo, nome) {\n  console.log(`Boa ${periodo}, ${nome}!`);\n}',
-                'resposta_correta': 'call e apply executam agora, bind retorna função',
+                'pergunta': '📊 Data Science: Analise sentimentos de texto',
+                'codigo_exemplo': 'function analisarSentimento(texto) {\n  const positivas = ["amo", "incrível", "ótimo"];\n  const negativas = ["odeio", "horrível", "ruim"];\n  return positivas.___(palavra => texto.includes(palavra)) ? "positivo" : "negativo";\n}',
+                'resposta_correta': 'some',
                 'nivel': 'avancado',
-                'teoria': 'Todos três métodos permitem definir o valor de "this" em uma função. call() aceita argumentos separados, apply() aceita array de argumentos, e bind() retorna uma nova função com "this" definido, sem executar imediatamente.',
+                'teoria': generator.generate_real_world_analogy('some() verifica se pelo menos um elemento atende à condição. É como um detector de palavras-chave em reviews!'),
                 'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'call e apply executam agora, bind retorna função',
-                    'Todos executam a função imediatamente',
-                    'bind é mais rápido que call e apply',
-                    'Não há diferença prática'
-                ])
+                'modulo': 'arrays_objetos',
+                'ordem_no_modulo': 1,
+                'dica': generator.generate_contextual_hint('some', 'some'),
+                'tipo': 'completion'
             },
             {
-                'pergunta': 'Como funciona o Async/Await por baixo dos panos?',
-                'codigo_exemplo': 'async function buscarDados() {\n  const resposta = await fetch(url);\n  const dados = await resposta.json();\n  return dados;\n}',
-                'resposta_correta': 'Syntax sugar sobre Promises',
-                'nivel': 'avancado',
-                'teoria': 'Async/await é syntax sugar sobre Promises que torna o código assíncrono mais legível. Uma função async sempre retorna uma Promise, e await pausa a execução até que a Promise seja resolvida, sem bloquear o thread principal.',
+                'pergunta': '🎵 Spotify: Crie um player de música virtual',
+                'codigo_exemplo': 'class MusicPlayer {\n  constructor() {\n    this.playlist = [];\n    this.currentIndex = 0;\n  }\n  adicionarMusica(musica) {\n    this.playlist.___(musica);\n  }\n}',
+                'resposta_correta': 'push',
+                'nivel': 'intermediario',
+                'teoria': generator.generate_real_world_analogy('push() adiciona elementos ao final do array. É como adicionar músicas ao final da sua playlist!'),
                 'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'Syntax sugar sobre Promises',
-                    'Novo tipo de thread',
-                    'Método síncrono melhorado',
-                    'Substituto para callbacks'
-                ])
-            },
-            {
-                'pergunta': 'O que é Currying em JavaScript?',
-                'codigo_exemplo': 'function soma(a) {\n  return function(b) {\n    return a + b;\n  };\n}',
-                'resposta_correta': 'Técnica de transformar função multi-argumento em cadeia de funções de um argumento',
-                'nivel': 'avancado',
-                'teoria': 'Currying é uma técnica funcional onde uma função com múltiplos argumentos é transformada em uma sequência de funções, cada uma recebendo um único argumento. Isso permite composição de funções e aplicação parcial.',
-                'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'Técnica de transformar função multi-argumento em cadeia de funções de um argumento',
-                    'Método para cozinhar dados',
-                    'Tipo de loop para arrays',
-                    'Padrão de design para objetos'
-                ])
-            },
-            {
-                'pergunta': 'Como funciona a Memoização para otimização de performance?',
-                'codigo_exemplo': 'function memoize(fn) {\n  const cache = {};\n  return function(...args) {\n    const key = JSON.stringify(args);\n    if (cache[key]) return cache[key];\n    return cache[key] = fn.apply(this, args);\n  };\n}',
-                'resposta_correta': 'Cache de resultados de funções pesadas',
-                'nivel': 'avancado',
-                'teoria': 'Memoização é uma técnica de otimização que armazena os resultados de chamadas de função caras e retorna o resultado em cache quando as mesmas entradas ocorrem novamente. É especialmente útil para funções recursivas ou com cálculos intensivos.',
-                'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'Cache de resultados de funções pesadas',
-                    'Técnica para memorizar código',
-                    'Método de compressão de dados',
-                    'Padrão para gerenciar memória'
-                ])
-            },
-            {
-                'pergunta': 'O que são Generators e como funcionam?',
-                'codigo_exemplo': 'function* contadorInfinito() {\n  let i = 0;\n  while (true) {\n    yield i++;\n  }\n}',
-                'resposta_correta': 'Funções que podem ser pausadas e retomadas',
-                'nivel': 'avancado',
-                'teoria': 'Generators são funções especiais que podem ser pausadas e retomadas. Eles usam a palavra-chave yield para retornar valores múltiplos ao longo do tempo. São úteis para lazy evaluation, iteradores customizados e controle assíncrono.',
-                'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'Funções que podem ser pausadas e retomadas',
-                    'Funções que geram números aleatórios',
-                    'Método para criar arrays',
-                    'Tipo de loop para objetos'
-                ])
-            },
-            {
-                'pergunta': 'Como funciona o Web Workers API para multi-threading?',
-                'codigo_exemplo': '// main.js\nconst worker = new Worker("worker.js");\nworker.postMessage("Hello");',
-                'resposta_correta': 'Executa código JavaScript em thread separado',
-                'nivel': 'avancado',
-                'teoria': 'Web Workers permitem executar código JavaScript em threads em segundo plano, separados do thread principal da interface. Isso evita bloqueio da UI durante operações pesadas. Os workers se comunicam com o thread principal via mensagens.',
-                'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'Executa código JavaScript em thread separado',
-                    'Trabalha com elementos da Web',
-                    'Método para criar servidores',
-                    'API para trabalhar com arquivos'
-                ])
-            },
-            {
-                'pergunta': 'O que é Tree Shaking e como otimiza bundles?',
-                'codigo_exemplo': '// Webpack remove código não utilizado\nimport { func1, func2 } from "./module";\n// Se só func1 for usado, func2 é removido',
-                'resposta_correta': 'Remoção de código não utilizado durante o build',
-                'nivel': 'avancado',
-                'teoria': 'Tree Shaking é uma técnica de otimização que remove código não utilizado (dead code) dos bundles finais. Funciona analisando o grafo de dependências e eliminando exportações que não são importadas em nenhum lugar da aplicação.',
-                'premium': True,
-                'tipo': 'multiple_choice',
-                'opcoes': json.dumps([
-                    'Remoção de código não utilizado durante o build',
-                    'Técnica para organizar arquivos',
-                    'Método para cortar strings',
-                    'Padrão para estruturas de dados'
-                ])
+                'modulo': 'arrays_objetos',
+                'ordem_no_modulo': 2,
+                'dica': generator.generate_contextual_hint('push', 'push'),
+                'tipo': 'completion'
             }
         ]
 
+        # EXERCÍCIOS FREEMIUM CRIATIVOS
+        freemium_exercises = [
+            {
+                'pergunta': '🛍️ Ifood: Calcule o total do pedido',
+                'codigo_exemplo': 'function calcularTotal(itens) {\n  let total = 0;\n  for (let item of itens) {\n    total += item.___;\n  }\n  return total;\n}',
+                'resposta_correta': 'preco',
+                'nivel': 'iniciante',
+                'teoria': generator.generate_real_world_analogy('Acesse propriedades de objetos usando ponto. É como ver o preço de cada item no cardápio!'),
+                'premium': False,
+                'modulo': 'arrays_objetos',
+                'ordem_no_modulo': 3,
+                'dica': generator.generate_contextual_hint('preco', 'preco'),
+                'tipo': 'completion'
+            },
+            {
+                'pergunta': '🚗 Uber: Calcule tempo de viagem',
+                'codigo_exemplo': 'function calcularTempo(distancia, velocidade) {\n  return distancia / ___;\n}',
+                'resposta_correta': 'velocidade',
+                'nivel': 'iniciante',
+                'teoria': generator.generate_real_world_analogy('Use variáveis nos cálculos. É como calcular quanto tempo leva uma corrida de Uber!'),
+                'premium': False,
+                'modulo': 'variaveis_operadores',
+                'ordem_no_modulo': 1,
+                'dica': generator.generate_contextual_hint('velocidade', 'velocidade'),
+                'tipo': 'completion'
+            },
+            {
+                'pergunta': '📱 Nubank: Verifique saldo suficiente',
+                'codigo_exemplo': 'function podeComprar(saldo, preco) {\n  ___ saldo >= preco;\n}',
+                'resposta_correta': 'return',
+                'nivel': 'iniciante',
+                'teoria': generator.generate_real_world_analogy('Funções retornam resultados. É como o Nubank verificando se você tem saldo para uma compra!'),
+                'premium': False,
+                'modulo': 'funcoes',
+                'ordem_no_modulo': 1,
+                'dica': generator.generate_contextual_hint('return', 'return'),
+                'tipo': 'completion'
+            },
+            {
+                'pergunta': '⚽ Futebol: Controle placar do jogo',
+                'codigo_exemplo': 'let placar = { timeA: 0, timeB: 0 };\nfunction marcarGol(time) {\n  placar[time] ___;\n}',
+                'resposta_correta': '++',
+                'nivel': 'iniciante',
+                'teoria': generator.generate_real_world_analogy('O operador ++ incrementa valores. É como marcar um gol e aumentar o placar!'),
+                'premium': False,
+                'modulo': 'variaveis_operadores',
+                'ordem_no_modulo': 2,
+                'dica': generator.generate_contextual_hint('++', '++'),
+                'tipo': 'completion'
+            },
+            {
+                'pergunta': '🎯 Quiz: Verifique resposta correta',
+                'codigo_exemplo': 'function verificarResposta(respostaUsuario, respostaCorreta) {\n  return respostaUsuario.___() === respostaCorreta.toLowerCase();\n}',
+                'resposta_correta': 'toLowerCase',
+                'nivel': 'intermediario',
+                'teoria': generator.generate_real_world_analogy('toLowerCase() padroniza texto. É como um quiz que aceita "Verdadeiro" ou "verdadeiro"!'),
+                'premium': False,
+                'modulo': 'funcoes',
+                'ordem_no_modulo': 2,
+                'dica': generator.generate_contextual_hint('toLowerCase', 'toLowerCase'),
+                'tipo': 'completion'
+            },
+            {
+                'pergunta': '📈 Investimentos: Calcule rendimentos',
+                'codigo_exemplo': 'function calcularRendimento(capital, taxa, tempo) {\n  return capital * Math.___(1 + taxa, tempo);\n}',
+                'resposta_correta': 'pow',
+                'nivel': 'intermediario',
+                'teoria': generator.generate_real_world_analogy('Math.pow() calcula potências. É como calcular juros compostos nas suas economias!'),
+                'premium': False,
+                'modulo': 'variaveis_operadores',
+                'ordem_no_modulo': 3,
+                'dica': generator.generate_contextual_hint('pow', 'pow'),
+                'tipo': 'completion'
+            },
+            {
+                'pergunta': '🎮 Game: Movimente personagem no canvas',
+                'codigo_exemplo': 'function moverDireita(personagem) {\n  personagem.x += personagem.___;\n}',
+                'resposta_correta': 'velocidade',
+                'nivel': 'intermediario',
+                'teoria': generator.generate_real_world_analogy('Propriedades de objetos controlam comportamento. É como mover um personagem em um jogo!'),
+                'premium': False,
+                'modulo': 'arrays_objetos',
+                'ordem_no_modulo': 4,
+                'dica': generator.generate_contextual_hint('velocidade', 'velocidade'),
+                'tipo': 'completion'
+            },
+            {
+                'pergunta': '🤖 Automação: Processe lista de tarefas',
+                'codigo_exemplo': 'const tarefas = ["estudar", "trabalhar", "descansar"];\ntarefas.___(tarefa => console.log(`Fazendo: ${tarefa}`));',
+                'resposta_correta': 'forEach',
+                'nivel': 'intermediario',
+                'teoria': generator.generate_real_world_analogy('forEach executa uma função para cada elemento. É como uma lista de tarefas sendo processada automaticamente!'),
+                'premium': False,
+                'modulo': 'arrays_objetos',
+                'ordem_no_modulo': 5,
+                'dica': generator.generate_contextual_hint('forEach', 'forEach'),
+                'tipo': 'completion'
+            }
+        ]
+
+        # EXERCÍCIOS DESAFIO FINAL POR MÓDULO
+        challenge_exercises = [
+            {
+                'pergunta': '🏆 DESAFIO FINAL: Crie um sistema de carrinho de compras',
+                'codigo_exemplo': 'class Carrinho {\n  constructor() {\n    this.itens = [];\n    this.total = 0;\n  }\n  adicionarItem(produto) {\n    this.itens.___(produto);\n    this.total += produto.preco;\n  }\n}',
+                'resposta_correta': 'push',
+                'nivel': 'intermediario',
+                'teoria': generator.generate_real_world_analogy('Junte tudo que aprendeu: arrays, objetos, funções e métodos! É como criar um carrinho de compras completo.'),
+                'premium': False,
+                'modulo': 'arrays_objetos',
+                'ordem_no_modulo': 6,
+                'dica': 'Lembre-se: push adiciona ao array!',
+                'tipo': 'completion',
+                'eh_desafio_final': True
+            },
+            {
+                'pergunta': '🏆 DESAFIO FINAL: Sistema de autenticação com async/await',
+                'codigo_exemplo': 'async function login(email, senha) {\n  try {\n    const resposta = ___ fetch("/api/login", {\n      method: "POST",\n      body: JSON.stringify({ email, senha })\n    });\n    return await resposta.json();\n  } catch (erro) {\n    console.log("Erro:", erro);\n  }\n}',
+                'resposta_correta': 'await',
+                'nivel': 'avancado',
+                'teoria': generator.generate_real_world_analogy('Async/await + fetch + tratamento de erros = sistema profissional! É como fazer login em qualquer app moderno.'),
+                'premium': True,
+                'modulo': 'programacao_assincrona',
+                'ordem_no_modulo': 6,
+                'dica': 'Não esqueça do await antes do fetch!',
+                'tipo': 'completion',
+                'eh_desafio_final': True
+            }
+        ]
+
+        # COMBINAR TODOS OS EXERCÍCIOS
+        all_exercises = freemium_exercises + premium_exercises + challenge_exercises
+
         try:
-            for exercicio_data in exercicios:
-                # Verificar se o exercício já existe
-                existente = Exercicio.query.filter_by(pergunta=exercicio_data['pergunta']).first()
-                if not existente:
-                    exercicio = Exercicio(**exercicio_data)
-                    db.session.add(exercicio)
-                    print(f"✅ Adicionado: {exercicio_data['pergunta'][:50]}...")
+            print("🎨 CRIANDO EXERCÍCIOS INOVADORES...")
+            created_count = 0
+            
+            for exercise_data in all_exercises:
+                # Garantir valores padrão
+                exercise_data.setdefault('tipo', 'completion')
+                exercise_data.setdefault('opcoes', None)
+                exercise_data.setdefault('eh_desafio_final', False)
+                
+                exercicio = Exercicio(**exercise_data)
+                db.session.add(exercicio)
+                created_count += 1
+                
+                # Feedback visual
+                premium_icon = "🔥" if exercise_data['premium'] else "🎯"
+                print(f"   {premium_icon} {exercise_data['pergunta'][:40]}...")
             
             db.session.commit()
-            total = Exercicio.query.count()
-            print(f"🎉 População concluída! Total de exercícios no banco: {total}")
             
-            # Estatísticas
+            # ESTATÍSTICAS DETALHADAS
+            print("\n" + "=" * 60)
+            print("📊 RELATÓRIO DE POPULAÇÃO")
+            print("=" * 60)
+            
+            total = Exercicio.query.count()
             freemium = Exercicio.query.filter_by(premium=False).count()
             premium = Exercicio.query.filter_by(premium=True).count()
-            multipla_escolha = Exercicio.query.filter(Exercicio.tipo == 'multiple_choice').count()
             
-            print(f"📊 Estatísticas:")
-            print(f"   - Freemium: {freemium} exercícios")
-            print(f"   - Premium: {premium} exercícios")
-            print(f"   - Múltipla escolha: {multipla_escolha} exercícios")
+            # Estatísticas por módulo
+            modulos = ['variaveis_operadores', 'estruturas_controle', 'funcoes', 
+                      'arrays_objetos', 'programacao_assincrona', 'dom_manipulation']
+            
+            print(f"\n🏗️  EXERCÍCIOS CRIADOS: {created_count}")
+            print(f"💰 FREEMIUM: {freemium} exercícios")
+            print(f"🔥 PREMIUM: {premium} exercícios")
+            
+            print("\n📁 DISTRIBUIÇÃO POR MÓDULO:")
+            for modulo in modulos:
+                count = Exercicio.query.filter_by(modulo=modulo).count()
+                premium_count = Exercicio.query.filter_by(modulo=modulo, premium=True).count()
+                freemium_count = count - premium_count
+                print(f"   📂 {modulo}: {count} total ({freemium_count} 🎯 + {premium_count} 🔥)")
+            
+            # Estatísticas por nível
+            print("\n🎯 DISTRIBUIÇÃO POR NÍVEL:")
+            for nivel in ['iniciante', 'intermediario', 'avancado']:
+                count = Exercicio.query.filter_by(nivel=nivel).count()
+                print(f"   ⭐ {nivel}: {count} exercícios")
+            
+            print(f"\n✅ POPULAÇÃO CONCLUÍDA COM SUCESSO!")
+            print("🎉 SEU MVP AGORA TEM EXERCÍCIOS SOFISTICADOS E INOVADORES!")
             
         except Exception as e:
             db.session.rollback()
-            print(f"❌ Erro durante a população: {str(e)}")
+            print(f"❌ ERRO CRÍTICO: {str(e)}")
             raise
 
 if __name__ == '__main__':
-    with app.app_context():
-        populate_exercises()
+    populate_exercises()

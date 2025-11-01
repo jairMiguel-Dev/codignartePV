@@ -1,26 +1,31 @@
-from app import app
-import asyncio
+from app import app, db
+from models import Exercicio
 import os
 
-async def initialize_app():
-    """Inicializa a aplicação de forma assíncrona"""
+def initialize_app():
+    """Inicializa a aplicação de forma síncrona"""
     try:
-        # Importar e executar a inicialização do banco
-        from app import init_database
-        await init_database()
-        print("✅ Banco de dados inicializado com sucesso!")
+        with app.app_context():
+            print("🔄 Criando tabelas do banco...")
+            db.create_all()
+            print("✅ Tabelas criadas com sucesso!")
+            
+            # Verificar se já existem exercícios
+            if not Exercicio.query.first():
+                print("🔄 Criando dados iniciais...")
+                from app import criar_dados_iniciais
+                criar_dados_iniciais()
+                print("✅ Dados iniciais criados!")
+            
+            print("🎉 Aplicação inicializada com sucesso!")
     except Exception as e:
         print(f"❌ Erro na inicialização: {e}")
 
-# Criar e inicializar a aplicação
-def create_application():
-    """Factory function para criar a aplicação"""
-    # Executar inicialização assíncrona
-    asyncio.run(initialize_app())
-    return app
+# Inicializar a aplicação
+initialize_app()
 
 # Aplicação para o Gunicorn/Waitress
-application = create_application()
+application = app
 
 if __name__ == "__main__":
     # Para desenvolvimento local

@@ -111,9 +111,9 @@ MODULOS = {
     ]
 }
 
-async def criar_dados_iniciais():
+def criar_dados_iniciais():
     try:
-        if not await asyncio.to_thread(Exercicio.query.first):
+        if not Exercicio.query.first():
             exercicios = [
                 Exercicio(
                     pergunta="Qual é o resultado de 5 + 3? É tipo somar 5 reais com 3 reais na carteira!",
@@ -213,18 +213,18 @@ async def criar_dados_iniciais():
             for exercicio in exercicios:
                 db.session.add(exercicio)
             
-            await asyncio.to_thread(db.session.commit)
+            db.session.commit()
             print("✅ Dados iniciais criados com sucesso!")
     except Exception as e:
         print(f"❌ Erro ao criar dados iniciais: {str(e)}")
-        await asyncio.to_thread(db.session.rollback)
+        db.session.rollback()
 
-async def init_database():
+def init_database():
     """Inicializa o banco de dados"""
     try:
         with app.app_context():
-            await asyncio.to_thread(db.create_all)
-            await criar_dados_iniciais()
+            db.create_all()
+            criar_dados_iniciais()
             print("✅ Banco de dados inicializado com sucesso!")
     except Exception as e:
         print(f"❌ Erro ao inicializar banco: {str(e)}")
@@ -594,26 +594,44 @@ def proximo_exercicio(exercicio_atual_id):
             return render_template('conteudo_premium.html')
         return redirect(url_for('exercicio', exercicio_id=proximo.id))
     else:
-        # Voltar para lista de módulos se não há próximo exercício
-        return redirect(url_for('ver_modulo', modulo_id=exercicio_atual.modulo))
+        # Se não há próximo exercício, verificar se o módulo existe antes de redirecionar
+        if exercicio_atual.modulo:
+            try:
+                return redirect(url_for('ver_modulo', modulo_id=exercicio_atual.modulo))
+            except:
+                # Se houver erro ao construir a URL, redirecionar para módulos
+                return redirect(url_for('modulos'))
+        else:
+            # Se não há módulo definido, redirecionar para módulos
+            return redirect(url_for('modulos'))
 
 @app.route('/atualizar_tempo_restante')
 @login_required
 def atualizar_tempo_restante():
-    if not current_user.is_premium_active:
-        current_user.regenerar_vidas()
-        tempo_restante = current_user.tempo_para_proxima_vida()
-    else:
-        tempo_restante = 0
-    
-    db.session.commit()
-    
-    return jsonify({
-        'vidas': current_user.vidas,
-        'tempo_restante': tempo_restante,
-        'tempo_formatado': formatar_tempo(tempo_restante) if tempo_restante > 0 else "Pronta!",
-        'premium': current_user.is_premium_active
-    })
+    try:
+        if not current_user.is_premium_active:
+            current_user.regenerar_vidas()
+            tempo_restante = current_user.tempo_para_proxima_vida()
+        else:
+            tempo_restante = 0
+        
+        db.session.commit()
+        
+        return jsonify({
+            'vidas': current_user.vidas,
+            'tempo_restante': tempo_restante,
+            'tempo_formatado': formatar_tempo(tempo_restante) if tempo_restante > 0 else "Pronta!",
+            'premium': current_user.is_premium_active
+        })
+    except Exception as e:
+        print(f"❌ Erro em atualizar_tempo_restante: {str(e)}")
+        # Retorna valores padrão em caso de erro
+        return jsonify({
+            'vidas': current_user.vidas,
+            'tempo_restante': 0,
+            'tempo_formatado': "Erro",
+            'premium': current_user.is_premium_active
+        })
 
 def formatar_tempo(segundos):
     minutos = segundos // 60
@@ -633,7 +651,7 @@ def loja():
 
 @app.route('/criar-sessao-assinatura', methods=['POST'])
 @login_required
-async def criar_sessao_assinatura():
+def criar_sessao_assinatura():
     if current_user.is_premium_active:
         return jsonify({'error': 'Você já é usuário premium!'}), 400
     
@@ -647,28 +665,26 @@ async def criar_sessao_assinatura():
         print(f"🔄 Criando sessão de assinatura com price_id: {price_id}")
         
         try:
-            price = await asyncio.to_thread(lambda: stripe.Price.retrieve(price_id))
+            price = stripe.Price.retrieve(price_id)
             print(f"✅ Preço encontrado: {price.id} - {price.unit_amount} {price.currency}")
         except Exception as price_error:
             print(f"❌ Erro ao verificar preço: {str(price_error)}")
             return jsonify({'error': 'Preço não encontrado no Stripe'}), 500
         
-        checkout_session = await asyncio.to_thread(
-            lambda: stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=[{
-                    'price': price_id,
-                    'quantity': 1,
-                }],
-                mode='subscription',
-                success_url=url_for('pagamento_sucesso', _external=True) + '?session_id={CHECKOUT_SESSION_ID}&tipo=assinatura',
-                cancel_url=url_for('loja', _external=True),
-                customer_email=current_user.email,
-                metadata={
-                    'user_id': current_user.id,
-                    'tipo': 'assinatura'
-                }
-            )
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price': price_id,
+                'quantity': 1,
+            }],
+            mode='subscription',
+            success_url=url_for('pagamento_sucesso', _external=True) + '?session_id={CHECKOUT_SESSION_ID}&tipo=assinatura',
+            cancel_url=url_for('loja', _external=True),
+            customer_email=current_user.email,
+            metadata={
+                'user_id': current_user.id,
+                'tipo': 'assinatura'
+            }
         )
         
         transacao = Transacao(
@@ -682,7 +698,7 @@ async def criar_sessao_assinatura():
             quantidade_produto=1  # Uma assinatura
         )
         db.session.add(transacao)
-        await asyncio.to_thread(db.session.commit)
+        db.session.commit()
         
         print(f"✅ Sessão de assinatura criada: {checkout_session.url}")
         return jsonify({'checkout_url': checkout_session.url})
@@ -695,7 +711,7 @@ async def criar_sessao_assinatura():
 
 @app.route('/criar-sessao-vidas/<int:quantidade>', methods=['POST'])
 @login_required
-async def criar_sessao_vidas(quantidade):
+def criar_sessao_vidas(quantidade):
     print(f"🔍 Iniciando criação de sessão para {quantidade} vidas")
     
     if current_user.is_premium_active:
@@ -716,7 +732,7 @@ async def criar_sessao_vidas(quantidade):
         print(f"🔄 Criando sessão de vidas com price_id: {price_id}, quantidade: {quantidade}")
         
         try:
-            price = await asyncio.to_thread(lambda: stripe.Price.retrieve(price_id))
+            price = stripe.Price.retrieve(price_id)
             print(f"✅ Preço encontrado: {price.id} - {price.unit_amount} {price.currency}")
         except Exception as price_error:
             print(f"❌ Erro ao verificar preço: {str(price_error)}")
@@ -727,23 +743,21 @@ async def criar_sessao_vidas(quantidade):
         
         print(f"🔗 URLs: success={success_url}, cancel={cancel_url}")
         
-        checkout_session = await asyncio.to_thread(
-            lambda: stripe.checkout.Session.create(
-                payment_method_types=['card'],
-                line_items=[{
-                    'price': price_id,
-                    'quantity': 1,
-                }],
-                mode='payment',
-                success_url=success_url,
-                cancel_url=cancel_url,
-                customer_email=current_user.email,
-                metadata={
-                    'user_id': current_user.id,
-                    'tipo': 'vidas',
-                    'quantidade': quantidade
-                }
-            )
+        checkout_session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price': price_id,
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=success_url,
+            cancel_url=cancel_url,
+            customer_email=current_user.email,
+            metadata={
+                'user_id': current_user.id,
+                'tipo': 'vidas',
+                'quantidade': quantidade
+            }
         )
         
         valores = {1: 0.99, 3: 3.00, 5: 4.75}
@@ -760,7 +774,7 @@ async def criar_sessao_vidas(quantidade):
             quantidade_produto=quantidade
         )
         db.session.add(transacao)
-        await asyncio.to_thread(db.session.commit)
+        db.session.commit()
         
         print(f"✅ Sessão de vidas criada com sucesso: {checkout_session.url}")
         return jsonify({'checkout_url': checkout_session.url})
@@ -773,7 +787,7 @@ async def criar_sessao_vidas(quantidade):
         return jsonify({'error': 'Erro ao processar pagamento. Tente novamente.'}), 500
 
 @app.route('/webhook/stripe', methods=['POST'])
-async def stripe_webhook():
+def stripe_webhook():
     if not STRIPE_WEBHOOK_SECRET:
         return 'Webhook secret não configurado', 400
         
@@ -781,10 +795,8 @@ async def stripe_webhook():
     sig_header = request.headers.get('Stripe-Signature')
 
     try:
-        event = await asyncio.to_thread(
-            lambda: stripe.Webhook.construct_event(
-                payload, sig_header, STRIPE_WEBHOOK_SECRET
-            )
+        event = stripe.Webhook.construct_event(
+            payload, sig_header, STRIPE_WEBHOOK_SECRET
         )
     except ValueError as e:
         print(f"❌ Erro no payload do webhook: {e}")
@@ -797,23 +809,23 @@ async def stripe_webhook():
 
     if event['type'] == 'checkout.session.completed':
         session = event['data']['object']
-        await processar_pagamento_sucesso(session)
+        processar_pagamento_sucesso(session)
         
     elif event['type'] == 'customer.subscription.deleted':
         subscription = event['data']['object']
-        await processar_cancelamento_assinatura(subscription)
+        processar_cancelamento_assinatura(subscription)
         
     elif event['type'] == 'charge.refunded':
         refund = event['data']['object']
-        await processar_reembolso_stripe(refund)
+        processar_reembolso_stripe(refund)
 
     return jsonify({'status': 'success'})
 
-async def processar_pagamento_sucesso(session):
+def processar_pagamento_sucesso(session):
     try:
         user_id = session['metadata']['user_id']
         tipo = session['metadata']['tipo']
-        usuario = await asyncio.to_thread(lambda: Usuario.query.get(user_id))
+        usuario = Usuario.query.get(user_id)
         
         if not usuario:
             print(f"❌ Usuário não encontrado: {user_id}")
@@ -821,9 +833,7 @@ async def processar_pagamento_sucesso(session):
         
         print(f"✅ Processando pagamento para usuário: {usuario.username}, tipo: {tipo}")
         
-        transacao = await asyncio.to_thread(
-            lambda: Transacao.query.filter_by(stripe_session_id=session.id).first()
-        )
+        transacao = Transacao.query.filter_by(stripe_session_id=session.id).first()
         if transacao:
             transacao.status = 'confirmada'
             transacao.stripe_payment_intent = session.payment_intent
@@ -846,25 +856,23 @@ async def processar_pagamento_sucesso(session):
             usuario.adicionar_vidas_compradas(quantidade)
             print(f"✅ {quantidade} vidas adicionadas para usuário: {usuario.username}")
         
-        await asyncio.to_thread(db.session.commit)
+        db.session.commit()
         print(f"✅ Pagamento processado com sucesso para {usuario.username}")
         
     except Exception as e:
         print(f"❌ Erro ao processar pagamento: {str(e)}")
-        await asyncio.to_thread(db.session.rollback)
+        db.session.rollback()
 
-async def processar_cancelamento_assinatura(subscription):
+def processar_cancelamento_assinatura(subscription):
     print(f"📝 Assinatura cancelada: {subscription.id}")
 
-async def processar_reembolso_stripe(refund):
+def processar_reembolso_stripe(refund):
     """Processa webhooks de reembolso da Stripe"""
     try:
         payment_intent = refund.payment_intent
         
         # Encontrar transação pelo payment_intent
-        transacao = await asyncio.to_thread(
-            lambda: Transacao.query.filter_by(stripe_payment_intent=payment_intent).first()
-        )
+        transacao = Transacao.query.filter_by(stripe_payment_intent=payment_intent).first()
         
         if not transacao:
             print(f"❌ Transação não encontrada para payment_intent: {payment_intent}")
@@ -888,11 +896,11 @@ async def processar_reembolso_stripe(refund):
             
             print(f"❌ Reembolso falhou: {refund.id} - {refund.failure_reason}")
         
-        await asyncio.to_thread(db.session.commit)
+        db.session.commit()
         
     except Exception as e:
         print(f"❌ Erro ao processar reembolso: {str(e)}")
-        await asyncio.to_thread(db.session.rollback)
+        db.session.rollback()
 
 @app.route('/pagamento-sucesso')
 @login_required
@@ -919,7 +927,7 @@ def pagamento_sucesso():
         try:
             session = stripe.checkout.Session.retrieve(session_id)
             if session.payment_status == 'paid':
-                asyncio.create_task(processar_pagamento_sucesso(session))
+                processar_pagamento_sucesso(session)
                 return redirect(url_for('pagamento_sucesso', session_id=session_id, tipo=tipo, quantidade=quantidade))
         except Exception as e:
             print(f"Erro ao verificar sessão: {str(e)}")
@@ -1144,12 +1152,78 @@ def internal_error(error):
     db.session.rollback()
     return render_template('500.html'), 500
 
-# if __name__ == '__main__':
-#     asyncio.run(init_database())
+if __name__ == '__main__':
+    # Inicialização síncrona do banco de dados
+    with app.app_context():
+        try:
+            db.create_all()
+            print("✅ Tabelas do banco criadas/verificadas")
+            
+            # Criar dados iniciais de forma síncrona
+            if not Exercicio.query.first():
+                exercicios = [
+                    Exercicio(
+                        pergunta="Qual é o resultado de 5 + 3? É tipo somar 5 reais com 3 reais na carteira!",
+                        codigo_exemplo="console.log(5 + 3);",
+                        resposta_correta="8",
+                        nivel="iniciante",
+                        teoria="O operador '+' é usado para adição em JavaScript, igual quando você soma dinheiro!",
+                        modulo='variaveis_operadores',
+                        ordem_no_modulo=1,
+                        dica="Pense em quanto dinheiro você teria se juntasse 5 reais com 3 reais!"
+                    ),
+                    Exercicio(
+                        pergunta="Como declarar uma variável chamada 'nome' em JavaScript? Tipo quando você guarda o nome de alguém na memória!",
+                        codigo_exemplo="// Declare a variável 'nome'\n___ nome;",
+                        resposta_correta="let",
+                        nivel="iniciante",
+                        teoria="Use 'let' para declarar variáveis que podem mudar, igual sua idade que muda todo ano!",
+                        modulo='variaveis_operadores',
+                        ordem_no_modulo=2,
+                        dica="Lembre-se: 'let' é como 'deixe' eu guardar este valor na memória!"
+                    ),
+                    Exercicio(
+                        pergunta="Qual é o resultado de 10 % 3? É tipo dividir 10 balas entre 3 amigos e ver quantas sobram!",
+                        codigo_exemplo="console.log(10 % 3);",
+                        resposta_correta="1",
+                        nivel="iniciante",
+                        teoria="O operador '%' retorna o resto da divisão. 10 dividido por 3 dá 3 e sobra 1!",
+                        modulo='variaveis_operadores',
+                        ordem_no_modulo=3,
+                        dica="Pense: se você tem 10 balas e 3 amigos, cada um fica com 3 balas e sobra 1!"
+                    ),
+                    Exercicio(
+                        pergunta="Complete o código para declarar uma constante 'PI' com o valor 3.14",
+                        codigo_exemplo="___ PI = 3.14;",
+                        resposta_correta="const",
+                        nivel="iniciante",
+                        teoria="Use 'const' para coisas que não mudam, igual seu nome ou a data do seu aniversário!",
+                        modulo='variaveis_operadores',
+                        ordem_no_modulo=4,
+                        dica="'const' é para constantes - coisas que são constantes, que não mudam!"
+                    ),
+                    Exercicio(
+                        pergunta="DESAFIO FINAL: Crie uma variável 'idade' com valor 20 e depois some 5. Imprima o resultado!",
+                        codigo_exemplo="// Crie a variável idade\n___ idade = 20;\n// Some 5\nidade = idade ___ 5;\n// Imprima a idade\nconsole.log(idade);",
+                        resposta_correta="let+",
+                        nivel="iniciante",
+                        teoria="Hora de juntar tudo que aprendemos! Variáveis e operadores trabalhando juntos!",
+                        modulo='variaveis_operadores',
+                        ordem_no_modulo=5,
+                        eh_desafio_final=True,
+                        dica="Primeiro declare a variável, depois some, depois imprima! Use 'let' e '+'"
+                    ),
+                ]
+                
+                for exercicio in exercicios:
+                    db.session.add(exercicio)
+                
+                db.session.commit()
+                print("✅ Dados iniciais criados com sucesso!")
+        except Exception as e:
+            print(f"❌ Erro na inicialização do banco: {str(e)}")
+            db.session.rollback()
     
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
     app.run(host='0.0.0.0', port=port, debug=debug)
-#     port = int(os.environ.get('PORT', 5000))
-#     debug = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
-#     app.run(host='0.0.0.0', port=port, debug=debug)

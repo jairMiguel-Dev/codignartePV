@@ -49,9 +49,10 @@ class Usuario(UserMixin, db.Model):
         agora = datetime.utcnow()
         
         if not self.ultima_regeneracao:
-            return 1800
+            return 1800  # 30 minutos em segundos
         
-        if self.ultima_regeneracao.tzinfo is not None:
+        # Garantir que ambas as datas estão naive (sem timezone)
+        if isinstance(self.ultima_regeneracao, datetime):
             ultima_regeneracao_naive = self.ultima_regeneracao.replace(tzinfo=None)
         else:
             ultima_regeneracao_naive = self.ultima_regeneracao
@@ -78,14 +79,15 @@ class Usuario(UserMixin, db.Model):
             self.ultima_regeneracao = agora
             return
         
-        if self.ultima_regeneracao.tzinfo is not None:
+        # Garantir que ambas as datas estão naive (sem timezone)
+        if isinstance(self.ultima_regeneracao, datetime):
             ultima_regeneracao_naive = self.ultima_regeneracao.replace(tzinfo=None)
         else:
             ultima_regeneracao_naive = self.ultima_regeneracao
             
         tempo_decorrido = agora - ultima_regeneracao_naive
         
-        if tempo_decorrido.total_seconds() >= 1800:
+        if tempo_decorrido.total_seconds() >= 1800:  # 30 minutos
             vidas_regeneradas = int(tempo_decorrido.total_seconds() // 1800)
             self.vidas = min(3, self.vidas + vidas_regeneradas)
             self.ultima_regeneracao = agora

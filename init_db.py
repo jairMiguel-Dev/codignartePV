@@ -1,5 +1,5 @@
 from app import app, db
-from models import Usuario, Exercicio, Progresso, Transacao
+from models import Exercicio
 
 def init_database():
     with app.app_context():
