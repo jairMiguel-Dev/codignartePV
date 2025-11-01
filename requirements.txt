@@ -5,6 +5,5 @@ Werkzeug==2.3.7
 stripe==5.5.0
 python-dotenv==1.0.0
 gunicorn==21.2.0
-psycopg[binary]==3.2.1
+psycopg2-binary==2.9.7
 waitress==2.1.2
-aiohttp==3.8.5
